@@ -12,21 +12,22 @@ import { avatarCanvas } from "@/lib/placeholder";
 const RADIUS = 5.2;
 const TWO_PI = Math.PI * 2;
 
-/** 把成员卡片画成贴图（避免外部字体依赖） */
-function drawCard(m: Member): HTMLCanvasElement {
+/** 把成员卡片画成贴图（避免外部字体依赖）。传入 img 时用真实头像，否则用首字占位 */
+function drawCard(m: Member, img?: HTMLImageElement, target?: HTMLCanvasElement): HTMLCanvasElement {
   const w = 512;
   const h = 680;
-  const c = document.createElement("canvas");
+  const c = target ?? document.createElement("canvas");
   c.width = w;
   c.height = h;
   const ctx = c.getContext("2d")!;
+  ctx.clearRect(0, 0, w, h);
 
   // 玻璃底
   const round = (r: number) => {
     ctx.beginPath();
     ctx.roundRect(8, 8, w - 16, h - 16, r);
   };
-  ctx.fillStyle = "rgba(14,16,30,0.92)";
+  ctx.fillStyle = "rgba(12,20,16,0.94)";
   round(36);
   ctx.fill();
   const edge = ctx.createLinearGradient(0, 0, w, h);
@@ -37,8 +38,32 @@ function drawCard(m: Member): HTMLCanvasElement {
   round(36);
   ctx.stroke();
 
-  // 头像
-  ctx.drawImage(avatarCanvas(m.name, m.palette, 256), w / 2 - 110, 70, 220, 220);
+  // 头像：圆形裁切
+  const cx = w / 2;
+  const cy = 180;
+  const r = 110;
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.clip();
+  if (img) {
+    const ir = img.width / img.height;
+    let dw = r * 2;
+    let dh = r * 2;
+    if (ir > 1) dw = dh * ir;
+    else dh = dw / ir;
+    ctx.drawImage(img, cx - dw / 2, cy - dh / 2, dw, dh);
+  } else {
+    ctx.drawImage(avatarCanvas(m.name, m.palette, 256), cx - r, cy - r, r * 2, r * 2);
+  }
+  ctx.restore();
+  // 头像描边
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.strokeStyle = edge;
+  ctx.lineWidth = 4;
+  ctx.stroke();
 
   ctx.textAlign = "center";
   ctx.fillStyle = "#ffffff";
@@ -80,12 +105,25 @@ function Card({
   onPick: (m: Member, angle: number) => void;
 }) {
   const mesh = useRef<THREE.Mesh>(null);
+  const canvas = useMemo(() => drawCard(member), [member]);
   const texture = useMemo(() => {
-    const t = new THREE.CanvasTexture(drawCard(member));
+    const t = new THREE.CanvasTexture(canvas);
     t.anisotropy = 8;
     t.colorSpace = THREE.SRGBColorSpace;
     return t;
-  }, [member]);
+  }, [canvas]);
+
+  // 异步加载真实头像，加载完重绘卡片纹理
+  useEffect(() => {
+    if (!member.photo) return;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      drawCard(member, img, canvas);
+      texture.needsUpdate = true;
+    };
+    img.src = member.photo;
+  }, [member, canvas, texture]);
 
   useFrame(() => {
     if (!mesh.current) return;
@@ -220,12 +258,17 @@ export default function MemberRing() {
               onClick={(e) => e.stopPropagation()}
             >
               <div
-                className="mx-auto flex h-24 w-24 items-center justify-center rounded-full text-4xl font-black text-white"
+                className="mx-auto flex h-24 w-24 items-center justify-center overflow-hidden rounded-full text-4xl font-black text-white"
                 style={{
                   background: `linear-gradient(135deg, ${active.member.palette[0]}, ${active.member.palette[1]})`,
                 }}
               >
-                {active.member.name.slice(0, 1)}
+                {active.member.photo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={active.member.photo} alt={active.member.name} className="h-full w-full object-cover" />
+                ) : (
+                  active.member.name.slice(0, 1)
+                )}
               </div>
               <h2 className="mt-5 font-display text-3xl font-bold text-white">{active.member.name}</h2>
               <p className="mt-1 text-sm text-mint">

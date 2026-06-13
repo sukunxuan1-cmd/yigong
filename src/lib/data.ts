@@ -7,6 +7,8 @@ export type Member = {
   activities: number;
   motto: string;
   palette: [string, string];
+  /** 头像图：放在 public/members/<id>.jpg，留空则用首字渐变占位 */
+  photo?: string;
 };
 
 export type Photo = {
@@ -34,16 +36,16 @@ export type VolunteerEvent = {
 };
 
 export const members: Member[] = [
-  { id: "m1", name: "林晓雨", role: "团长", department: "人力资源部", joined: "2021-03", activities: 42, motto: "微光成炬，温暖同行。", palette: ["#1fa45c", "#7edca4"] },
-  { id: "m2", name: "陈则铭", role: "副团长", department: "技术研发部", joined: "2021-05", activities: 38, motto: "代码改变世界，行动温暖人心。", palette: ["#15803d", "#b9e6cb"] },
-  { id: "m3", name: "苏婉清", role: "活动策划", department: "市场部", joined: "2021-09", activities: 35, motto: "每一次出发，都值得被记录。", palette: ["#2fb874", "#0f6b3e"] },
-  { id: "m4", name: "赵启航", role: "物资管理", department: "运营部", joined: "2022-01", activities: 29, motto: "把小事做好，就是大事。", palette: ["#e6b85c", "#1fa45c"] },
-  { id: "m5", name: "何静怡", role: "摄影记录", department: "设计部", joined: "2022-04", activities: 31, motto: "用镜头留住每个善意瞬间。", palette: ["#4cc98a", "#155e38"] },
-  { id: "m6", name: "吴天乐", role: "安全保障", department: "行政部", joined: "2022-06", activities: 26, motto: "守护好每一位伙伴。", palette: ["#7edca4", "#1fa45c"] },
-  { id: "m7", name: "郑沛霖", role: "外联协调", department: "公共关系部", joined: "2022-10", activities: 22, motto: "连接善意，传递力量。", palette: ["#9fc97a", "#2a7d4f"] },
-  { id: "m8", name: "杜若曦", role: "财务监督", department: "财务部", joined: "2023-02", activities: 18, motto: "每一分善款都清清楚楚。", palette: ["#0f7a45", "#8be0b3"] },
-  { id: "m9", name: "高一帆", role: "新媒体运营", department: "品牌部", joined: "2023-05", activities: 15, motto: "让更多人看见，让更多人加入。", palette: ["#36b06d", "#d9c08a"] },
-  { id: "m10", name: "孙若楠", role: "培训讲师", department: "培训发展部", joined: "2023-08", activities: 12, motto: "授人以渔，温暖以心。", palette: ["#1c9355", "#a8e6c2"] },
+  { id: "m1", name: "林晓雨", role: "团长", department: "人力资源部", joined: "2021-03", activities: 42, motto: "微光成炬，温暖同行。", palette: ["#1fa45c", "#7edca4"], photo: "/members/m1.jpg" },
+  { id: "m2", name: "陈则铭", role: "副团长", department: "技术研发部", joined: "2021-05", activities: 38, motto: "代码改变世界，行动温暖人心。", palette: ["#15803d", "#b9e6cb"], photo: "/members/m2.jpg" },
+  { id: "m3", name: "苏婉清", role: "活动策划", department: "市场部", joined: "2021-09", activities: 35, motto: "每一次出发，都值得被记录。", palette: ["#2fb874", "#0f6b3e"], photo: "/members/m3.jpg" },
+  { id: "m4", name: "赵启航", role: "物资管理", department: "运营部", joined: "2022-01", activities: 29, motto: "把小事做好，就是大事。", palette: ["#e6b85c", "#1fa45c"], photo: "/members/m4.jpg" },
+  { id: "m5", name: "何静怡", role: "摄影记录", department: "设计部", joined: "2022-04", activities: 31, motto: "用镜头留住每个善意瞬间。", palette: ["#4cc98a", "#155e38"], photo: "/members/m5.jpg" },
+  { id: "m6", name: "吴天乐", role: "安全保障", department: "行政部", joined: "2022-06", activities: 26, motto: "守护好每一位伙伴。", palette: ["#7edca4", "#1fa45c"], photo: "/members/m6.jpg" },
+  { id: "m7", name: "郑沛霖", role: "外联协调", department: "公共关系部", joined: "2022-10", activities: 22, motto: "连接善意，传递力量。", palette: ["#9fc97a", "#2a7d4f"], photo: "/members/m7.jpg" },
+  { id: "m8", name: "杜若曦", role: "财务监督", department: "财务部", joined: "2023-02", activities: 18, motto: "每一分善款都清清楚楚。", palette: ["#0f7a45", "#8be0b3"], photo: "/members/m8.jpg" },
+  { id: "m9", name: "高一帆", role: "新媒体运营", department: "品牌部", joined: "2023-05", activities: 15, motto: "让更多人看见，让更多人加入。", palette: ["#36b06d", "#d9c08a"], photo: "/members/m9.jpg" },
+  { id: "m10", name: "孙若楠", role: "培训讲师", department: "培训发展部", joined: "2023-08", activities: 12, motto: "授人以渔，温暖以心。", palette: ["#1c9355", "#a8e6c2"], photo: "/members/m10.jpg" },
 ];
 
 export const events: VolunteerEvent[] = [
