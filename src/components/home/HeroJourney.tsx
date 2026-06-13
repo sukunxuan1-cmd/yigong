@@ -269,11 +269,11 @@ function useScene(events: VolunteerEvent[]) {
 
     // 开场：照片退到两侧/上方，让出中央的 logo
     const act0Layout: { pos: [number, number, number]; rot: number; scale: number }[] = [
-      { pos: [-4.9, 1.2, -2.4], rot: 0.16, scale: 0.85 },
-      { pos: [-3.5, -1.5, -3.4], rot: 0.1, scale: 0.78 },
-      { pos: [4.9, 1.0, -2.6], rot: -0.16, scale: 0.85 },
-      { pos: [3.5, -1.6, -3.2], rot: -0.1, scale: 0.78 },
-      { pos: [0, 2.5, -3.8], rot: 0, scale: 0.72 },
+      { pos: [-5.0, 1.25, -2.2], rot: 0.14, scale: 1.2 },
+      { pos: [-3.7, -1.7, -2.9], rot: 0.09, scale: 1.05 },
+      { pos: [5.0, 1.05, -2.2], rot: -0.14, scale: 1.2 },
+      { pos: [3.7, -1.8, -2.9], rot: -0.09, scale: 1.05 },
+      { pos: [0, 2.95, -3.0], rot: 0, scale: 1.0 },
     ];
     const act0 = pick(5).map((s, i) => ({
       tex: makePhotoTexture(s.seed, s.src, 600, 400, undefined, true),
@@ -503,7 +503,7 @@ function Scene({
           rotation={[0, a.rot, 0]}
           scale={a.scale}
         >
-          <planeGeometry args={[2.4, 1.6]} />
+          <planeGeometry args={[3.0, 2.0]} />
           <meshBasicMaterial map={a.tex} transparent alphaTest={0.5} />
         </mesh>
       ))}
