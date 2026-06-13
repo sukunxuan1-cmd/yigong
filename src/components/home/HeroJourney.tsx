@@ -52,13 +52,62 @@ function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, w: numb
 
 type Overlay = (ctx: CanvasRenderingContext2D, w: number, h: number) => void;
 
-function makePhotoTexture(seed: number, src: string | undefined, w: number, h: number, overlay?: Overlay) {
+/** 圆角白边相框（拍立得感）：透明背景 + 白卡 + 圆角裁切照片 */
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+}
+
+function makePhotoTexture(
+  seed: number,
+  src: string | undefined,
+  w: number,
+  h: number,
+  overlay?: Overlay,
+  frame?: boolean
+) {
   const c = document.createElement("canvas");
   c.width = w;
   c.height = h;
   const ctx = c.getContext("2d")!;
-  ctx.drawImage(photoCanvas(seed), 0, 0, w, h);
-  overlay?.(ctx, w, h);
+
+  const paint = (source: HTMLImageElement | HTMLCanvasElement) => {
+    ctx.clearRect(0, 0, w, h);
+    if (frame) {
+      // 白色相框卡片 + 柔和投影
+      const m = Math.round(w * 0.035); // 外边距
+      const pad = Math.round(w * 0.03); // 白边宽度
+      const rad = Math.round(w * 0.05);
+      ctx.save();
+      ctx.shadowColor = "rgba(120,80,50,0.28)";
+      ctx.shadowBlur = w * 0.05;
+      ctx.shadowOffsetY = h * 0.02;
+      ctx.fillStyle = "#fffaf2";
+      roundRect(ctx, m, m, w - m * 2, h - m * 2, rad);
+      ctx.fill();
+      ctx.restore();
+      // 内部照片
+      const ix = m + pad;
+      const iy = m + pad;
+      const iw = w - (m + pad) * 2;
+      const ih = h - (m + pad) * 2;
+      ctx.save();
+      roundRect(ctx, ix, iy, iw, ih, rad * 0.6);
+      ctx.clip();
+      const sw = source instanceof HTMLImageElement ? source.naturalWidth || source.width : source.width;
+      const sh = source instanceof HTMLImageElement ? source.naturalHeight || source.height : source.height;
+      const scale = Math.max(iw / sw, ih / sh);
+      const dw = sw * scale;
+      const dh = sh * scale;
+      ctx.drawImage(source, ix + (iw - dw) / 2, iy + (ih - dh) / 2, dw, dh);
+      ctx.restore();
+    } else {
+      drawCover(ctx, source as HTMLImageElement, w, h);
+    }
+    overlay?.(ctx, w, h);
+  };
+
+  paint(photoCanvas(seed));
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
@@ -66,9 +115,7 @@ function makePhotoTexture(seed: number, src: string | undefined, w: number, h: n
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
-      ctx.clearRect(0, 0, w, h);
-      drawCover(ctx, img, w, h);
-      overlay?.(ctx, w, h);
+      paint(img);
       tex.needsUpdate = true;
     };
     img.src = src;
@@ -190,7 +237,7 @@ function useScene(events: VolunteerEvent[]) {
       const y = Math.sin(i * 1.3) * 0.7;
       const scale = 0.9 + ((i * 7) % 5) * 0.12;
       return {
-        tex: makePhotoTexture(s.seed, s.src, 800, 533),
+        tex: makePhotoTexture(s.seed, s.src, 870, 580, undefined, true),
         label: makeLabelTexture(s.date.slice(0, 4), s.title),
         pos: [x, y, z] as [number, number, number],
         rotY: -side * 0.22,
@@ -220,11 +267,17 @@ function useScene(events: VolunteerEvent[]) {
       idx: i,
     }));
 
+    // 开场：照片退到两侧/上方，让出中央的 logo
+    const act0Layout: { pos: [number, number, number]; rot: number; scale: number }[] = [
+      { pos: [-4.9, 1.2, -2.4], rot: 0.16, scale: 0.85 },
+      { pos: [-3.5, -1.5, -3.4], rot: 0.1, scale: 0.78 },
+      { pos: [4.9, 1.0, -2.6], rot: -0.16, scale: 0.85 },
+      { pos: [3.5, -1.6, -3.2], rot: -0.1, scale: 0.78 },
+      { pos: [0, 2.5, -3.8], rot: 0, scale: 0.72 },
+    ];
     const act0 = pick(5).map((s, i) => ({
-      tex: makePhotoTexture(s.seed, s.src, 512, 341),
-      pos: [Math.cos(i * 1.7) * 3.2, Math.sin(i * 2.1) * 1.8, -0.5 - i * 0.9] as [number, number, number],
-      rot: (i - 2) * 0.18,
-      scale: 0.8 + (i % 3) * 0.18,
+      tex: makePhotoTexture(s.seed, s.src, 600, 400, undefined, true),
+      ...act0Layout[i],
     }));
 
     return { heroTex, corridor, stack, act0, logoTex: makeLogoTexture() };
@@ -273,6 +326,7 @@ function Scene({
   const logoRef = useRef<THREE.Mesh>(null);
   const act0Refs = useRef<THREE.Mesh[]>([]);
   const labelRefs = useRef<THREE.Mesh[]>([]);
+  const corridorGroupRef = useRef<THREE.Group>(null);
   const stackRefs = useRef<THREE.Group[]>([]);
   const ambientRef = useRef<THREE.AmbientLight>(null);
   const spotRef = useRef<THREE.SpotLight>(null);
@@ -388,6 +442,9 @@ function Scene({
       titleRef.current.style.transform = `translateY(${(p - 0.22) * -140}px)`;
     }
 
+    /* —— 第二幕 长廊：仅在接近/进入长廊时显示，避免开场遮挡 logo —— */
+    if (corridorGroupRef.current) corridorGroupRef.current.visible = p > 0.24;
+
     /* —— 第二幕 标签淡入 —— */
     const reveal = smooth(0.3, 0.42, p);
     labelRefs.current.forEach((mesh) => {
@@ -432,7 +489,7 @@ function Scene({
       <pointLight ref={tableRef} position={[0, 6, -31]} color="#fff0d8" distance={30} intensity={0} />
 
       {/* 第〇幕 logo */}
-      <mesh ref={logoRef} position={[0, 0.45, 0]}>
+      <mesh ref={logoRef} position={[0, 0.45, 2.6]}>
         <planeGeometry args={[3.2, 1.3]} />
         <meshStandardMaterial map={logoTex} transparent emissive="#9fe6c0" emissiveIntensity={0.15} />
       </mesh>
@@ -446,8 +503,8 @@ function Scene({
           rotation={[0, a.rot, 0]}
           scale={a.scale}
         >
-          <planeGeometry args={[2.2, 1.46]} />
-          <meshStandardMaterial map={a.tex} transparent roughness={0.85} />
+          <planeGeometry args={[2.4, 1.6]} />
+          <meshStandardMaterial map={a.tex} transparent alphaTest={0.5} roughness={0.85} />
         </mesh>
       ))}
 
@@ -457,24 +514,26 @@ function Scene({
         <primitive object={heroMat} attach="material" />
       </mesh>
 
-      {/* 第二幕 长廊 */}
-      {corridor.map((c, i) => (
-        <group key={i} position={c.pos} rotation={[0, c.rotY, 0]}>
-          <mesh scale={c.scale}>
-            <planeGeometry args={[2.6, 1.73]} />
-            <meshStandardMaterial map={c.tex} roughness={0.9} side={THREE.DoubleSide} />
-          </mesh>
-          <mesh
-            position={[0, -1.05 * c.scale, 0.02]}
-            ref={(el) => {
-              if (el) labelRefs.current[i] = el;
-            }}
-          >
-            <planeGeometry args={[2.4, 0.5]} />
-            <meshBasicMaterial map={c.label} transparent opacity={0} depthWrite={false} />
-          </mesh>
-        </group>
-      ))}
+      {/* 第二幕 长廊（开场/Hero 阶段整体隐藏，进入长廊才浮现） */}
+      <group ref={corridorGroupRef}>
+        {corridor.map((c, i) => (
+          <group key={i} position={c.pos} rotation={[0, c.rotY, 0]}>
+            <mesh scale={c.scale}>
+              <planeGeometry args={[2.6, 1.73]} />
+              <meshStandardMaterial map={c.tex} transparent alphaTest={0.5} roughness={0.9} side={THREE.DoubleSide} />
+            </mesh>
+            <mesh
+              position={[0, -1.05 * c.scale, 0.02]}
+              ref={(el) => {
+                if (el) labelRefs.current[i] = el;
+              }}
+            >
+              <planeGeometry args={[2.4, 0.5]} />
+              <meshBasicMaterial map={c.label} transparent opacity={0} depthWrite={false} />
+            </mesh>
+          </group>
+        ))}
+      </group>
 
       {/* 第三幕 桌面 + 卡片堆（桌面尺寸收小，且仅第三幕淡入） */}
       <mesh ref={tableMeshRef} position={[0, -0.35, -33]} rotation={[-Math.PI / 2, 0, 0]} visible={false}>
