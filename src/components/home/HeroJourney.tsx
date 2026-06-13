@@ -541,8 +541,8 @@ function Scene({
         <planeGeometry args={[16, 12]} />
         <meshStandardMaterial color="#ecd6bb" roughness={1} transparent opacity={0} />
       </mesh>
-      {/* 桌面上的可互动 3D LOGO 徽章（卡片飞走后浮现，可悬停/点击） */}
-      <LogoBadge narrFrac={NARR_FRAC} position={[0, -0.28, -33]} />
+      {/* 桌面上的可互动 3D LOGO 勋章（卡片飞走后浮现，可悬停/点击） */}
+      <LogoBadge narrFrac={NARR_FRAC} position={[0, -0.35, -33]} />
       {stack.map((s, i) => (
         <group
           key={i}

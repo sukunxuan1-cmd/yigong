@@ -11,8 +11,11 @@ const smooth = (a: number, b: number, x: number) => {
   return t * t * (3 - 2 * t);
 };
 
-/** 圆形 LOGO 徽章贴图：优先用 public/logo.png，否则画一个暖绿占位徽章 */
-function makeBadgeTexture() {
+/**
+ * 勋章正面贴图：不透明奶油底 + 居中放置真实 logo（public/logo.png）。
+ * 未提供 logo.png 时仅显示浅灰“LOGO”占位字样，不绘制任何标识。
+ */
+function makeFaceTexture() {
   const S = 512;
   const c = document.createElement("canvas");
   c.width = S;
@@ -21,69 +24,33 @@ function makeBadgeTexture() {
 
   const drawBase = () => {
     ctx.clearRect(0, 0, S, S);
-    // 柔和投影 + 白色圆盘
-    ctx.save();
-    ctx.shadowColor = "rgba(120,80,50,0.35)";
-    ctx.shadowBlur = 34;
-    ctx.shadowOffsetY = 10;
-    ctx.beginPath();
-    ctx.arc(S / 2, S / 2, S * 0.46, 0, Math.PI * 2);
     ctx.fillStyle = "#fffaf2";
-    ctx.fill();
-    ctx.restore();
-    // 双层绿环
+    ctx.fillRect(0, 0, S, S);
+    // 内圈细描边
     ctx.beginPath();
-    ctx.arc(S / 2, S / 2, S * 0.46, 0, Math.PI * 2);
-    ctx.lineWidth = 10;
-    ctx.strokeStyle = "#3bb273";
+    ctx.arc(S / 2, S / 2, S * 0.45, 0, Math.PI * 2);
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "rgba(59,178,115,0.35)";
     ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(S / 2, S / 2, S * 0.405, 0, Math.PI * 2);
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "rgba(59,178,115,0.4)";
-    ctx.stroke();
-  };
-
-  const drawFallback = () => {
-    // 友好的螺旋叶片标记
-    ctx.save();
-    ctx.translate(S / 2, S * 0.43);
-    ctx.strokeStyle = "#2f9e63";
-    ctx.lineCap = "round";
-    for (let k = 0; k < 3; k++) {
-      ctx.beginPath();
-      const r = 92 - k * 26;
-      ctx.lineWidth = 16 - k * 3;
-      ctx.arc(0, 0, r, Math.PI * 0.15 + k * 0.2, Math.PI * 1.55 + k * 0.2);
-      ctx.stroke();
-    }
-    // 叶尖圆点
-    ctx.beginPath();
-    ctx.fillStyle = "#ff9f7e";
-    ctx.arc(92, 8, 12, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#4a382e";
-    ctx.font = "bold 58px system-ui, sans-serif";
-    ctx.fillText("Reshine", S / 2, S * 0.74);
-    ctx.fillStyle = "#3bb273";
-    ctx.font = "600 26px system-ui, sans-serif";
-    ctx.fillText("义工团 · WOOD INDUSTRY", S / 2, S * 0.83);
   };
 
   drawBase();
-  drawFallback();
+  ctx.fillStyle = "rgba(74,56,46,0.28)";
+  ctx.font = "600 40px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("LOGO", S / 2, S / 2);
+
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
+  tex.center.set(0.5, 0.5);
+  tex.rotation = Math.PI; // 圆柱顶面 UV 方向修正，使 logo 正立朝向镜头
 
-  // 尝试加载真实 logo
   const img = new Image();
   img.onload = () => {
     drawBase();
-    // 在内圈内等比绘制 logo
-    const inner = S * 0.72;
+    const inner = S * 0.78;
     const ir = img.width / img.height;
     let dw = inner;
     let dh = inner;
@@ -120,30 +87,32 @@ function makeHeartTexture(color: string) {
 
 const HEART_COLORS = ["#ff7a8a", "#ff9f7e", "#3bb273", "#ffc35b", "#86dcae"];
 const HEART_POOL = 16;
+const R = 3.0; // 勋章半径
+const TH = 0.55; // 勋章厚度
 
 type Heart = { active: boolean; x: number; y: number; z: number; vx: number; vy: number; vz: number; life: number };
 
 export default function LogoBadge({
   narrFrac,
-  position = [0, -0.28, -33],
+  position = [0, -0.35, -33],
 }: {
   narrFrac: number;
   position?: [number, number, number];
 }) {
   const scroll = useScroll();
   const groupRef = useRef<THREE.Group>(null);
-  const discRef = useRef<THREE.Mesh>(null);
+  const matsRef = useRef<THREE.MeshBasicMaterial[]>([]);
   const heartRefs = useRef<THREE.Sprite[]>([]);
   const hearts = useRef<Heart[]>(Array.from({ length: HEART_POOL }, () => ({ active: false, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, life: 0 })));
 
-  const badgeTex = useMemo(makeBadgeTexture, []);
+  const faceTex = useMemo(makeFaceTexture, []);
   const heartTexes = useMemo(() => HEART_COLORS.map(makeHeartTexture), []);
   const hover = useRef(false);
   const spinTarget = useRef(0);
   const pop = useRef(1);
-  const baseY = position[1];
+  const baseY = position[1] + TH / 2; // 勋章躺在桌面上
 
-  useEffect(() => () => badgeTex.dispose(), [badgeTex]);
+  useEffect(() => () => faceTex.dispose(), [faceTex]);
 
   const burst = () => {
     let n = 0;
@@ -153,7 +122,7 @@ export default function LogoBadge({
       const sp = 0.5 + Math.random() * 0.7;
       h.active = true;
       h.x = 0;
-      h.y = 0.15;
+      h.y = 0.3;
       h.z = 0;
       h.vx = Math.cos(a) * sp;
       h.vz = Math.sin(a) * sp;
@@ -169,17 +138,13 @@ export default function LogoBadge({
     const g = groupRef.current;
     if (g) {
       g.visible = appear > 0.02;
-      // 悬停抬起 + 点击弹跳 + 缓慢自转 + 轻轻浮动
-      pop.current = THREE.MathUtils.lerp(pop.current, hover.current ? 1.12 : 1, 0.15);
-      const s = appear * pop.current;
-      g.scale.setScalar(s);
-      g.rotation.y = THREE.MathUtils.lerp(g.rotation.y, spinTarget.current, 0.12) + 0; // 朝目标转
-      spinTarget.current += dt * 0.5; // 持续缓慢自转
-      g.position.y = baseY + Math.sin(state.clock.elapsedTime * 1.5) * 0.05 + (hover.current ? 0.25 : 0);
+      pop.current = THREE.MathUtils.lerp(pop.current, hover.current ? 1.1 : 1, 0.15);
+      g.scale.setScalar(appear * pop.current);
+      g.rotation.y = THREE.MathUtils.lerp(g.rotation.y, spinTarget.current, 0.12);
+      spinTarget.current += dt * 0.45; // 缓慢自转
+      g.position.y = baseY + Math.sin(state.clock.elapsedTime * 1.5) * 0.05 + (hover.current ? 0.3 : 0);
     }
-    if (discRef.current) {
-      (discRef.current.material as THREE.MeshBasicMaterial).opacity = appear;
-    }
+    for (const m of matsRef.current) if (m) m.opacity = appear;
     // 爱心粒子
     hearts.current.forEach((h, i) => {
       const sp = heartRefs.current[i];
@@ -199,7 +164,7 @@ export default function LogoBadge({
       h.z += h.vz * dt;
       h.vy -= dt * 0.6;
       sp.visible = true;
-      sp.position.set(position[0] + h.x, baseY + 0.15 + h.y, position[2] + h.z);
+      sp.position.set(position[0] + h.x, baseY + 0.3 + h.y, position[2] + h.z);
       const grow = Math.min(1, (1 - h.life) * 4);
       sp.scale.setScalar(0.05 + 0.45 * grow);
       (sp.material as THREE.SpriteMaterial).opacity = Math.min(1, h.life * 1.6);
@@ -208,10 +173,9 @@ export default function LogoBadge({
 
   return (
     <>
-      <group ref={groupRef} position={position} visible={false}>
+      <group ref={groupRef} position={[position[0], baseY, position[2]]} visible={false}>
+        {/* 3D 圆柱勋章：木色边 + 正面 logo */}
         <mesh
-          ref={discRef}
-          rotation={[-Math.PI / 2, 0, 0]}
           onPointerOver={(e) => {
             e.stopPropagation();
             hover.current = true;
@@ -224,12 +188,31 @@ export default function LogoBadge({
           onClick={(e) => {
             e.stopPropagation();
             spinTarget.current += Math.PI * 2;
-            pop.current = 1.3;
+            pop.current = 1.28;
             burst();
           }}
         >
-          <circleGeometry args={[3.2, 64]} />
-          <meshBasicMaterial map={badgeTex} transparent toneMapped={false} />
+          <cylinderGeometry args={[R, R, TH, 72]} />
+          {/* 0=侧面(木色) 1=顶面(logo) 2=底面 */}
+          <meshBasicMaterial
+            attach="material-0"
+            color="#cda36f"
+            transparent
+            ref={(el) => el && (matsRef.current[0] = el)}
+          />
+          <meshBasicMaterial
+            attach="material-1"
+            map={faceTex}
+            toneMapped={false}
+            transparent
+            ref={(el) => el && (matsRef.current[1] = el)}
+          />
+          <meshBasicMaterial
+            attach="material-2"
+            color="#b88a55"
+            transparent
+            ref={(el) => el && (matsRef.current[2] = el)}
+          />
         </mesh>
       </group>
 
