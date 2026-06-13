@@ -17,7 +17,8 @@ import type { VolunteerEvent } from "@/lib/data";
  * ------------------------------------------------------------------ */
 
 const TOTAL_PAGES = 6;
-const NARR_FRAC = 4 / TOTAL_PAGES; // 前 4 页是 3D 叙事，后面是图文板块
+// 3D 叙事占滚动的前 78%，图文板块在末尾（第三幕画面转暗后）升起，避免提前露出
+const NARR_FRAC = 0.78;
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const smooth = (a: number, b: number, x: number) => {
@@ -278,6 +279,7 @@ function Scene({
   const spotTarget = useMemo(() => new THREE.Object3D(), []);
   const warmRef = useRef<THREE.PointLight>(null);
   const tableRef = useRef<THREE.PointLight>(null);
+  const tableMeshRef = useRef<THREE.Mesh>(null);
   const fogRef = useRef<THREE.FogExp2>(null);
   const bgRef = useRef<THREE.Color>(null);
 
@@ -343,6 +345,12 @@ function Scene({
       );
     }
     if (tableRef.current) tableRef.current.intensity = smooth(0.8, 0.95, p) * 42;
+    // 桌面只在进入第三幕俯视时淡入，避免在长廊阶段横穿照片（穿模）
+    if (tableMeshRef.current) {
+      const tm = tableMeshRef.current.material as THREE.MeshStandardMaterial;
+      tm.opacity = smooth(0.72, 0.84, p);
+      tableMeshRef.current.visible = tm.opacity > 0.01;
+    }
 
     if (fogRef.current) {
       fogRef.current.density = smooth(0.3, 0.45, p) * 0.05 * (1 - smooth(0.92, 1, p) * 0.6);
@@ -468,10 +476,10 @@ function Scene({
         </group>
       ))}
 
-      {/* 第三幕 桌面 + 卡片堆 */}
-      <mesh position={[0, -0.15, -33]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[40, 40]} />
-        <meshStandardMaterial color="#0d1310" roughness={1} />
+      {/* 第三幕 桌面 + 卡片堆（桌面尺寸收小，且仅第三幕淡入） */}
+      <mesh ref={tableMeshRef} position={[0, -0.35, -33]} rotation={[-Math.PI / 2, 0, 0]} visible={false}>
+        <planeGeometry args={[16, 12]} />
+        <meshStandardMaterial color="#0d1310" roughness={1} transparent opacity={0} />
       </mesh>
       {stack.map((s, i) => (
         <group
@@ -506,9 +514,9 @@ export default function HeroJourney({ events }: { events: VolunteerEvent[] }) {
         <ScrollControls pages={TOTAL_PAGES} damping={0.28}>
           <Scene events={events} titleRef={titleRef} />
           <Scroll html style={{ width: "100%" }}>
-            {/* 叙事在 offset≈0.667（≈333vh）结束，板块上移到 318vh 与收尾重叠 */}
-            <div style={{ position: "absolute", top: "318vh", width: "100vw" }}>
-              <div className="bg-gradient-to-b from-transparent via-ink/80 to-ink pt-24">
+            {/* 叙事在 offset≈0.78（≈390vh）结束，板块在 405vh 升起，仅在转暗的第三幕末尾露出 */}
+            <div style={{ position: "absolute", top: "405vh", width: "100vw" }}>
+              <div className="bg-gradient-to-b from-transparent via-ink/90 to-ink pt-28">
                 <HomeSections events={events} embedded />
               </div>
             </div>
