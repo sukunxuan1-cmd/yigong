@@ -62,19 +62,14 @@ export default function Timeline({ events }: { events: VolunteerEvent[] }) {
         }
       });
     }, root);
+    // 列表变化（筛选/搜索）时重建滚动动画
+    ScrollTrigger.refresh();
     return () => ctx.revert();
-  }, []);
+  }, [events]);
 
   return (
-    <div ref={root} className="mx-auto w-[min(94%,72rem)] pb-28 pt-36" style={{ perspective: 1200 }}>
-      <div className="text-center">
-        <h1 className="font-display text-4xl font-black md:text-5xl">
-          活动<span className="text-gradient">时间轴</span>
-        </h1>
-        <p className="mt-3 text-sm text-slate-400">沿着时间向下滚动，穿越我们走过的每一站</p>
-      </div>
-
-      <div className="relative mt-20">
+    <div ref={root} className="mx-auto w-[min(94%,72rem)] pb-28 pt-10" style={{ perspective: 1200 }}>
+      <div className="relative mt-8">
         {/* 中轴线 */}
         <div className="absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-white/8 md:block">
           <div

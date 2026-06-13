@@ -15,7 +15,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const m = getMember(id);
-  return { title: m ? `${m.name} · 义工团成员 · Reshine 义工团` : "成员介绍" };
+  if (!m) return { title: "成员介绍" };
+  return {
+    title: `${m.name} · 义工团成员 · Reshine 义工团`,
+    description: `${m.role} · ${m.department}。${m.bio}`,
+    openGraph: {
+      title: `${m.name} · ${m.role}`,
+      description: m.bio,
+      images: m.photo ? [m.photo] : undefined,
+    },
+  };
 }
 
 export default async function MemberPage({

@@ -19,6 +19,16 @@ export type CommentItem = {
   createdAt: number;
 };
 
+export type Signup = {
+  id: string;
+  eventId: string;
+  name: string;
+  dept: string;
+  contact: string;
+  note?: string;
+  createdAt: number;
+};
+
 export interface InteractionStore {
   getLikes(photoId: string): Promise<number>;
   addLikes(photoId: string, n: number): Promise<void>;
@@ -26,10 +36,13 @@ export interface InteractionStore {
   sendDanmaku(photoId: string, text: string, color: string): Promise<Danmaku>;
   getComments(photoId: string): Promise<CommentItem[]>;
   addComment(photoId: string, author: string, text: string, replyTo?: string | null): Promise<CommentItem>;
+  getSignups(eventId: string): Promise<Signup[]>;
+  addSignup(eventId: string, data: { name: string; dept: string; contact: string; note?: string }): Promise<Signup>;
   /** 实时订阅：返回取消函数 */
   onDanmaku(photoId: string, cb: (d: Danmaku) => void): () => void;
   onComment(photoId: string, cb: (c: CommentItem) => void): () => void;
   onLikes(photoId: string, cb: (total: number) => void): () => void;
+  onSignup(eventId: string, cb: (s: Signup) => void): () => void;
 }
 
 const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -124,6 +137,48 @@ class SupabaseStore implements InteractionStore {
       .subscribe();
     return () => void this.sb.removeChannel(ch);
   }
+
+  async getSignups(eventId: string) {
+    const { data } = await this.sb
+      .from("signups")
+      .select("*")
+      .eq("event_id", eventId)
+      .order("created_at", { ascending: true });
+    return (data ?? []).map(rowToSignup);
+  }
+
+  async addSignup(eventId: string, d: { name: string; dept: string; contact: string; note?: string }) {
+    const { data } = await this.sb
+      .from("signups")
+      .insert({ event_id: eventId, name: d.name, dept: d.dept, contact: d.contact, note: d.note ?? null })
+      .select()
+      .single();
+    return rowToSignup(data);
+  }
+
+  onSignup(eventId: string, cb: (s: Signup) => void) {
+    const ch = this.sb
+      .channel(`signups-${eventId}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "signups", filter: `event_id=eq.${eventId}` },
+        (payload) => cb(rowToSignup(payload.new))
+      )
+      .subscribe();
+    return () => void this.sb.removeChannel(ch);
+  }
+}
+
+function rowToSignup(r: any): Signup {
+  return {
+    id: String(r.id),
+    eventId: r.event_id,
+    name: r.name,
+    dept: r.dept,
+    contact: r.contact,
+    note: r.note ?? undefined,
+    createdAt: new Date(r.created_at).getTime(),
+  };
 }
 
 function rowToDanmaku(r: any): Danmaku {
@@ -227,6 +282,19 @@ class LocalStore implements InteractionStore {
     return c;
   }
 
+  async getSignups(eventId: string) {
+    return this.read<Signup[]>(`signups:${eventId}`, []);
+  }
+
+  async addSignup(eventId: string, d: { name: string; dept: string; contact: string; note?: string }) {
+    const s: Signup = { id: uid(), eventId, name: d.name, dept: d.dept, contact: d.contact, note: d.note, createdAt: Date.now() };
+    const list = this.read<Signup[]>(`signups:${eventId}`, []);
+    list.push(s);
+    this.write(`signups:${eventId}`, list);
+    this.emit(`signups:${eventId}`, s);
+    return s;
+  }
+
   onDanmaku(photoId: string, cb: (d: Danmaku) => void) {
     return this.listen(`danmaku:${photoId}`, cb);
   }
@@ -235,6 +303,9 @@ class LocalStore implements InteractionStore {
   }
   onLikes(photoId: string, cb: (total: number) => void) {
     return this.listen(`likes:${photoId}`, cb);
+  }
+  onSignup(eventId: string, cb: (s: Signup) => void) {
+    return this.listen(`signups:${eventId}`, cb);
   }
 }
 

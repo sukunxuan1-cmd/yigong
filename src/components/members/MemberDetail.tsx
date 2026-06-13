@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { members, type Member, type VolunteerEvent } from "@/lib/data";
 import PhotoImg from "@/components/PhotoImg";
+import ShareBar from "@/components/ShareBar";
 
 function initial(name: string) {
   return name.slice(0, 1);
@@ -67,6 +68,9 @@ export default function MemberDetail({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.12 }}
         >
+          <div className="mb-5">
+            <ShareBar title={`${member.name} · ${member.role}`} />
+          </div>
           <p className="font-display text-2xl font-bold text-gradient">“{member.motto}”</p>
 
           <div className="mt-6 grid grid-cols-3 gap-3">

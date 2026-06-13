@@ -8,6 +8,8 @@ const links = [
   { href: "/", label: "首页" },
   { href: "/members", label: "义工团" },
   { href: "/events", label: "活动档案" },
+  { href: "/impact", label: "数据" },
+  { href: "/join", label: "报名" },
 ];
 
 export default function Nav() {
@@ -29,14 +31,14 @@ export default function Nav() {
             <span className="ml-1.5 text-slate-300">义工团</span>
           </span>
         </Link>
-        <nav className="flex items-center gap-1 text-sm">
+        <nav className="flex items-center gap-0.5 text-sm">
           {links.map((l) => {
             const active = l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
             return (
               <Link
                 key={l.href}
                 href={l.href}
-                className={`relative rounded-xl px-4 py-2 transition-colors ${
+                className={`relative rounded-xl px-3 py-2 transition-colors ${
                   active ? "text-white" : "text-slate-400 hover:text-slate-200"
                 }`}
               >

@@ -172,6 +172,91 @@ export const events: VolunteerEvent[] = [
   },
 ];
 
+/** 即将开展、开放报名的活动 */
+export type UpcomingEvent = {
+  id: string;
+  title: string;
+  date: string;
+  location: string;
+  summary: string;
+  tags: string[];
+  slots: number; // 招募名额
+  cover: number; // 占位图 seed
+};
+
+export const upcomingEvents: UpcomingEvent[] = [
+  {
+    id: "tree-planting-2026-spring",
+    title: "春季城市植树日",
+    date: "2026-03-12",
+    location: "城北生态林场",
+    summary: "认领并种下属于我们的一片“义工林”，为城市再添一抹绿。",
+    tags: ["环保", "植树"],
+    slots: 50,
+    cover: 102,
+  },
+  {
+    id: "autism-care-2026",
+    title: "“来自星星的孩子”陪伴日",
+    date: "2026-04-19",
+    location: "市特殊教育中心",
+    summary: "一对一陪伴自闭症儿童做游戏、画画，用耐心点亮星星。",
+    tags: ["关爱", "陪伴"],
+    slots: 30,
+    cover: 203,
+  },
+  {
+    id: "community-clinic-2026",
+    title: "社区义诊与健康科普",
+    date: "2026-05-24",
+    location: "阳光社区广场",
+    summary: "协助医生开展免费义诊，为居民测量血压血糖、发放健康手册。",
+    tags: ["健康", "社区"],
+    slots: 25,
+    cover: 602,
+  },
+];
+
+export function getUpcoming(id: string) {
+  return upcomingEvents.find((e) => e.id === id);
+}
+
+/** 全站影响力统计（用于数据看板） */
+export function impactStats() {
+  const totalEvents = events.length;
+  const totalParticipants = events.reduce((s, e) => s + e.participants, 0);
+  const totalHours = events.reduce((s, e) => s + e.participants * e.hours, 0);
+  const totalPhotos = events.reduce((s, e) => s + e.photos.length, 0);
+
+  const byYear = new Map<string, { events: number; participants: number; hours: number }>();
+  for (const e of events) {
+    const y = e.date.slice(0, 4);
+    const cur = byYear.get(y) ?? { events: 0, participants: 0, hours: 0 };
+    cur.events += 1;
+    cur.participants += e.participants;
+    cur.hours += e.participants * e.hours;
+    byYear.set(y, cur);
+  }
+
+  const byTag = new Map<string, number>();
+  for (const e of events) for (const t of e.tags) byTag.set(t, (byTag.get(t) ?? 0) + 1);
+
+  return {
+    totalEvents,
+    totalParticipants,
+    totalHours,
+    totalPhotos,
+    members: members.length,
+    byYear: [...byYear.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([year, v]) => ({ year, ...v })),
+    byTag: [...byTag.entries()].sort((a, b) => b[1] - a[1]).map(([tag, count]) => ({ tag, count })),
+  };
+}
+
+/** 所有活动标签（去重） */
+export const allTags = [...new Set(events.flatMap((e) => e.tags))];
+/** 所有活动年份（去重，倒序） */
+export const allYears = [...new Set(events.map((e) => e.date.slice(0, 4)))].sort((a, b) => b.localeCompare(a));
+
 export function getEvent(slug: string) {
   return events.find((e) => e.slug === slug);
 }

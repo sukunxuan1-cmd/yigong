@@ -10,6 +10,7 @@ import DanmakuInput from "@/components/event/DanmakuInput";
 import LikeButton from "@/components/event/LikeButton";
 import Comments from "@/components/event/Comments";
 import PhotoImg from "@/components/PhotoImg";
+import ShareBar from "@/components/ShareBar";
 
 const PhotoStage = dynamic(() => import("@/components/event/PhotoStage"), {
   ssr: false,
@@ -124,9 +125,16 @@ export default function EventDetailClient({
         </div>
       </motion.div>
 
-      {/* 弹幕输入 */}
-      <div className="mt-4">
-        <DanmakuInput photoId={photo.id} selfMarkRef={selfMarkRef} />
+      {/* 弹幕输入 + 分享 */}
+      <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center">
+        <div className="flex-1">
+          <DanmakuInput photoId={photo.id} selfMarkRef={selfMarkRef} />
+        </div>
+        <ShareBar
+          title={event.title}
+          downloadUrl={photo.src}
+          downloadName={`${event.title}-${photo.caption}.jpg`}
+        />
       </div>
 
       {/* 缩略图条 */}

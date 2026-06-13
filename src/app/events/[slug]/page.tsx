@@ -15,7 +15,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const event = getEventBySlug(slug);
-  return { title: event ? `${event.title} · Reshine 义工团` : "活动详情" };
+  if (!event) return { title: "活动详情" };
+  return {
+    title: `${event.title} · Reshine 义工团`,
+    description: event.summary,
+    openGraph: {
+      title: event.title,
+      description: event.summary,
+      images: event.coverSrc ? [event.coverSrc] : undefined,
+    },
+  };
 }
 
 export default async function EventDetailPage({
