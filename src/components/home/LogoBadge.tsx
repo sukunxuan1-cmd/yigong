@@ -11,60 +11,6 @@ const smooth = (a: number, b: number, x: number) => {
   return t * t * (3 - 2 * t);
 };
 
-/**
- * 勋章正面贴图：不透明奶油底 + 居中放置真实 logo（public/logo.png）。
- * 未提供 logo.png 时仅显示浅灰“LOGO”占位字样，不绘制任何标识。
- */
-function makeFaceTexture() {
-  const S = 512;
-  const c = document.createElement("canvas");
-  c.width = S;
-  c.height = S;
-  const ctx = c.getContext("2d")!;
-
-  const drawBase = () => {
-    ctx.clearRect(0, 0, S, S);
-    ctx.fillStyle = "#fffaf2";
-    ctx.fillRect(0, 0, S, S);
-    // 内圈细描边
-    ctx.beginPath();
-    ctx.arc(S / 2, S / 2, S * 0.45, 0, Math.PI * 2);
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = "rgba(59,178,115,0.35)";
-    ctx.stroke();
-  };
-
-  drawBase();
-  ctx.fillStyle = "rgba(74,56,46,0.28)";
-  ctx.font = "600 40px system-ui, sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("LOGO", S / 2, S / 2);
-
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 8;
-  tex.center.set(0.5, 0.5);
-  tex.rotation = Math.PI; // 圆柱顶面 UV 方向修正，使 logo 正立朝向镜头
-
-  const img = new Image();
-  img.onload = () => {
-    drawBase();
-    const inner = S * 0.78;
-    const ir = img.width / img.height;
-    let dw = inner;
-    let dh = inner;
-    if (ir > 1) dh = inner / ir;
-    else dw = inner * ir;
-    ctx.drawImage(img, (S - dw) / 2, (S - dh) / 2, dw, dh);
-    tex.needsUpdate = true;
-  };
-  img.onerror = () => {};
-  img.src = "/logo.png";
-
-  return tex;
-}
-
 function makeHeartTexture(color: string) {
   const S = 128;
   const c = document.createElement("canvas");
@@ -87,8 +33,10 @@ function makeHeartTexture(color: string) {
 
 const HEART_COLORS = ["#ff7a8a", "#ff9f7e", "#3bb273", "#ffc35b", "#86dcae"];
 const HEART_POOL = 16;
-const R = 3.0; // 勋章半径
-const TH = 0.55; // 勋章厚度
+// 木牌尺寸（贴合 logo 约 2:1 的横版比例）
+const W = 6.4; // 宽
+const TH = 0.55; // 厚
+const D = 3.1; // 深
 
 type Heart = { active: boolean; x: number; y: number; z: number; vx: number; vy: number; vz: number; life: number };
 
@@ -101,18 +49,26 @@ export default function LogoBadge({
 }) {
   const scroll = useScroll();
   const groupRef = useRef<THREE.Group>(null);
-  const matsRef = useRef<THREE.MeshBasicMaterial[]>([]);
+  const mats = useRef<THREE.Material[]>([]);
   const heartRefs = useRef<THREE.Sprite[]>([]);
   const hearts = useRef<Heart[]>(Array.from({ length: HEART_POOL }, () => ({ active: false, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, life: 0 })));
 
-  const faceTex = useMemo(makeFaceTexture, []);
+  // 真实 logo 贴图（public/logo.png）
+  const logoTex = useMemo(() => {
+    const t = new THREE.TextureLoader().load("/logo.png");
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.anisotropy = 8;
+    t.center.set(0.5, 0.5);
+    return t;
+  }, []);
   const heartTexes = useMemo(() => HEART_COLORS.map(makeHeartTexture), []);
+
   const hover = useRef(false);
   const spinTarget = useRef(0);
   const pop = useRef(1);
-  const baseY = position[1] + TH / 2; // 勋章躺在桌面上
+  const baseY = position[1] + TH / 2;
 
-  useEffect(() => () => faceTex.dispose(), [faceTex]);
+  useEffect(() => () => logoTex.dispose(), [logoTex]);
 
   const burst = () => {
     let n = 0;
@@ -133,19 +89,20 @@ export default function LogoBadge({
   };
 
   useFrame((state, dt) => {
+    const t = state.clock.elapsedTime;
     const p = clamp01(scroll.offset / narrFrac);
     const appear = smooth(0.88, 0.96, p);
     const g = groupRef.current;
     if (g) {
       g.visible = appear > 0.02;
-      pop.current = THREE.MathUtils.lerp(pop.current, hover.current ? 1.1 : 1, 0.15);
+      pop.current = THREE.MathUtils.lerp(pop.current, hover.current ? 1.08 : 1, 0.15);
       g.scale.setScalar(appear * pop.current);
-      g.rotation.y = THREE.MathUtils.lerp(g.rotation.y, spinTarget.current, 0.12);
-      spinTarget.current += dt * 0.45; // 缓慢自转
-      g.position.y = baseY + Math.sin(state.clock.elapsedTime * 1.5) * 0.05 + (hover.current ? 0.3 : 0);
+      // 待机：轻轻左右摇摆（保持 logo 可读）；点击后叠加整圈旋转
+      const rock = Math.sin(t * 0.7) * 0.18;
+      g.rotation.y = THREE.MathUtils.lerp(g.rotation.y, spinTarget.current + rock, 0.12);
+      g.position.y = baseY + Math.sin(t * 1.5) * 0.05 + (hover.current ? 0.3 : 0);
     }
-    for (const m of matsRef.current) if (m) m.opacity = appear;
-    // 爱心粒子
+    for (const m of mats.current) if (m) (m as THREE.MeshBasicMaterial).opacity = appear;
     hearts.current.forEach((h, i) => {
       const sp = heartRefs.current[i];
       if (!sp) return;
@@ -171,10 +128,14 @@ export default function LogoBadge({
     });
   });
 
+  // BoxGeometry 材质顺序：0:+x 1:-x 2:+y(顶,logo) 3:-y 4:+z 5:-z
+  const setMat = (i: number) => (el: THREE.Material | null) => {
+    if (el) mats.current[i] = el;
+  };
+
   return (
     <>
       <group ref={groupRef} position={[position[0], baseY, position[2]]} visible={false}>
-        {/* 3D 圆柱勋章：木色边 + 正面 logo */}
         <mesh
           onPointerOver={(e) => {
             e.stopPropagation();
@@ -188,31 +149,17 @@ export default function LogoBadge({
           onClick={(e) => {
             e.stopPropagation();
             spinTarget.current += Math.PI * 2;
-            pop.current = 1.28;
+            pop.current = 1.22;
             burst();
           }}
         >
-          <cylinderGeometry args={[R, R, TH, 72]} />
-          {/* 0=侧面(木色) 1=顶面(logo) 2=底面 */}
-          <meshBasicMaterial
-            attach="material-0"
-            color="#cda36f"
-            transparent
-            ref={(el) => el && (matsRef.current[0] = el)}
-          />
-          <meshBasicMaterial
-            attach="material-1"
-            map={faceTex}
-            toneMapped={false}
-            transparent
-            ref={(el) => el && (matsRef.current[1] = el)}
-          />
-          <meshBasicMaterial
-            attach="material-2"
-            color="#b88a55"
-            transparent
-            ref={(el) => el && (matsRef.current[2] = el)}
-          />
+          <boxGeometry args={[W, TH, D]} />
+          <meshStandardMaterial attach="material-0" color="#c8975a" roughness={0.7} transparent ref={setMat(0)} />
+          <meshStandardMaterial attach="material-1" color="#c8975a" roughness={0.7} transparent ref={setMat(1)} />
+          <meshBasicMaterial attach="material-2" map={logoTex} toneMapped={false} transparent ref={setMat(2)} />
+          <meshStandardMaterial attach="material-3" color="#a8743f" roughness={0.8} transparent ref={setMat(3)} />
+          <meshStandardMaterial attach="material-4" color="#c8975a" roughness={0.7} transparent ref={setMat(4)} />
+          <meshStandardMaterial attach="material-5" color="#c8975a" roughness={0.7} transparent ref={setMat(5)} />
         </mesh>
       </group>
 
