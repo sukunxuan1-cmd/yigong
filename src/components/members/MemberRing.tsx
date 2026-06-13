@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
-import { Float, Stars } from "@react-three/drei";
+import { Float } from "@react-three/drei";
 import * as THREE from "three";
 import gsap from "gsap";
 import { AnimatePresence, motion } from "framer-motion";
@@ -28,7 +28,7 @@ function drawCard(m: Member, img?: HTMLImageElement, target?: HTMLCanvasElement)
     ctx.beginPath();
     ctx.roundRect(8, 8, w - 16, h - 16, r);
   };
-  ctx.fillStyle = "rgba(12,20,16,0.94)";
+  ctx.fillStyle = "rgba(255,252,247,0.97)";
   round(36);
   ctx.fill();
   const edge = ctx.createLinearGradient(0, 0, w, h);
@@ -67,7 +67,7 @@ function drawCard(m: Member, img?: HTMLImageElement, target?: HTMLCanvasElement)
   ctx.stroke();
 
   ctx.textAlign = "center";
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = "#4a382e";
   ctx.font = "bold 56px system-ui, sans-serif";
   ctx.fillText(m.name, w / 2, 380);
 
@@ -78,17 +78,17 @@ function drawCard(m: Member, img?: HTMLImageElement, target?: HTMLCanvasElement)
   ctx.beginPath();
   ctx.roundRect(w / 2 - tw / 2, 408, tw, 48, 24);
   ctx.fill();
-  ctx.fillStyle = "#0c0e1a";
+  ctx.fillStyle = "#3a2a20";
   ctx.fillText(m.role, w / 2, 442);
 
-  ctx.fillStyle = "rgba(255,255,255,0.65)";
+  ctx.fillStyle = "rgba(74,56,46,0.72)";
   ctx.font = "26px system-ui, sans-serif";
   ctx.fillText(m.department, w / 2, 510);
-  ctx.fillStyle = "rgba(255,255,255,0.45)";
+  ctx.fillStyle = "rgba(74,56,46,0.5)";
   ctx.font = "22px system-ui, sans-serif";
   ctx.fillText(`参与活动 ${m.activities} 次 · ${m.joined} 加入`, w / 2, 556);
 
-  ctx.fillStyle = m.palette[1];
+  ctx.fillStyle = m.palette[0];
   ctx.font = "italic 24px system-ui, sans-serif";
   ctx.fillText(`“${m.motto}”`, w / 2, 616);
   return c;
@@ -224,11 +224,10 @@ export default function MemberRing() {
   return (
     <div className="relative h-[calc(100vh-0px)] w-full">
       <Canvas camera={{ position: [0, 0.6, 10.5], fov: 50 }} dpr={[1, 2]}>
-        <color attach="background" args={["#070b09"]} />
-        <fog attach="fog" args={["#070b09", 9, 20]} />
-        <ambientLight intensity={0.6} />
+        <color attach="background" args={["#fff3e6"]} />
+        <fog attach="fog" args={["#fff3e6", 11, 24]} />
+        <ambientLight intensity={0.9} />
         <pointLight position={[0, 4, 6]} intensity={30} color="#7edca4" />
-        <Stars radius={60} depth={40} count={2500} factor={4} saturation={0.6} fade speed={0.6} />
         <Ring onPick={(member, angle) => setActive({ member, angle })} focusAngle={active?.angle ?? null} />
       </Canvas>
 
@@ -236,7 +235,7 @@ export default function MemberRing() {
         <h1 className="font-display text-4xl font-black md:text-5xl">
           义工团<span className="text-gradient">成员</span>
         </h1>
-        <p className="mt-3 text-sm text-slate-400">拖拽旋转星环 · 点击卡片认识 TA</p>
+        <p className="mt-3 text-sm text-mocha">拖拽旋转星环 · 点击卡片认识 TA</p>
       </div>
 
       {/* 聚焦详情：翻转卡片 */}
@@ -259,7 +258,7 @@ export default function MemberRing() {
               onClick={(e) => e.stopPropagation()}
             >
               <div
-                className="mx-auto flex h-24 w-24 items-center justify-center overflow-hidden rounded-full text-4xl font-black text-white"
+                className="mx-auto flex h-24 w-24 items-center justify-center overflow-hidden rounded-full text-4xl font-black text-cocoa"
                 style={{
                   background: `linear-gradient(135deg, ${active.member.palette[0]}, ${active.member.palette[1]})`,
                 }}
@@ -271,22 +270,22 @@ export default function MemberRing() {
                   active.member.name.slice(0, 1)
                 )}
               </div>
-              <h2 className="mt-5 font-display text-3xl font-bold text-white">{active.member.name}</h2>
+              <h2 className="mt-5 font-display text-3xl font-bold text-cocoa">{active.member.name}</h2>
               <p className="mt-1 text-sm text-mint">
                 {active.member.role} · {active.member.department}
               </p>
               <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-2xl bg-white/5 p-3">
+                <div className="rounded-2xl bg-cocoa/5 p-3">
                   <p className="text-2xl font-bold text-gradient">{active.member.activities}</p>
-                  <p className="text-slate-400">参与活动</p>
+                  <p className="text-mocha">参与活动</p>
                 </div>
-                <div className="rounded-2xl bg-white/5 p-3">
+                <div className="rounded-2xl bg-cocoa/5 p-3">
                   <p className="text-2xl font-bold text-gradient">{active.member.joined}</p>
-                  <p className="text-slate-400">加入时间</p>
+                  <p className="text-mocha">加入时间</p>
                 </div>
               </div>
-              <p className="mt-5 text-sm italic text-slate-300">“{active.member.motto}”</p>
-              <p className="mt-4 line-clamp-3 text-left text-sm leading-relaxed text-slate-400">
+              <p className="mt-5 text-sm italic text-cocoa/80">“{active.member.motto}”</p>
+              <p className="mt-4 line-clamp-3 text-left text-sm leading-relaxed text-mocha">
                 {active.member.bio}
               </p>
               <div className="mt-6 flex items-center justify-center gap-3">
@@ -297,7 +296,7 @@ export default function MemberRing() {
                   查看完整简介 →
                 </Link>
                 <button
-                  className="rounded-2xl border border-white/15 px-5 py-2 text-sm text-slate-300 transition-colors hover:border-leaf/60 hover:text-white"
+                  className="rounded-2xl border border-cocoa/15 px-5 py-2 text-sm text-cocoa/80 transition-colors hover:border-leaf/60 hover:text-cocoa"
                   onClick={() => setActive(null)}
                 >
                   返回星环

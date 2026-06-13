@@ -47,7 +47,7 @@ export default function HomeSections({
               {s.value.toLocaleString()}
               <span className="text-lg">{s.suffix}</span>
             </p>
-            <p className="mt-2 text-sm text-slate-400">{s.label}</p>
+            <p className="mt-2 text-sm text-mocha">{s.label}</p>
           </motion.div>
         ))}
       </section>
@@ -67,7 +67,7 @@ export default function HomeSections({
             <motion.div key={e.slug} custom={i} variants={fadeUp} {...reveal}>
               <Link
                 href={`/events/${e.slug}`}
-                className="group block overflow-hidden rounded-3xl border border-white/8 bg-haze transition-transform hover:-translate-y-1.5"
+                className="group block overflow-hidden rounded-3xl border border-cocoa/8 bg-sand transition-transform hover:-translate-y-1.5"
               >
                 <div className="relative aspect-[3/2] overflow-hidden">
                   <PhotoImg
@@ -80,8 +80,8 @@ export default function HomeSections({
                   <p className="absolute bottom-3 left-4 text-xs text-mint">{e.date} · {e.location}</p>
                 </div>
                 <div className="p-5">
-                  <h3 className="font-semibold text-white group-hover:text-gradient">{e.title}</h3>
-                  <p className="mt-2 line-clamp-2 text-sm text-slate-400">{e.summary}</p>
+                  <h3 className="font-semibold text-cocoa group-hover:text-gradient">{e.title}</h3>
+                  <p className="mt-2 line-clamp-2 text-sm text-mocha">{e.summary}</p>
                 </div>
               </Link>
             </motion.div>
@@ -90,13 +90,13 @@ export default function HomeSections({
         <div className="mt-10 flex justify-center gap-4">
           <Link
             href="/events"
-            className="glass glow-ring rounded-2xl px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-105"
+            className="glass glow-ring rounded-2xl px-6 py-3 text-sm font-semibold text-cocoa transition-transform hover:scale-105"
           >
             进入 3D 活动时间轴 →
           </Link>
           <Link
             href="/members"
-            className="rounded-2xl border border-white/10 px-6 py-3 text-sm font-semibold text-slate-300 transition-colors hover:border-leaf/60 hover:text-white"
+            className="rounded-2xl border border-cocoa/10 px-6 py-3 text-sm font-semibold text-cocoa/80 transition-colors hover:border-leaf/60 hover:text-cocoa"
           >
             认识义工团成员
           </Link>

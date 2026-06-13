@@ -62,21 +62,16 @@ export default function Timeline({ events }: { events: VolunteerEvent[] }) {
         }
       });
     }, root);
+    // 列表变化（筛选/搜索）时重建滚动动画
+    ScrollTrigger.refresh();
     return () => ctx.revert();
-  }, []);
+  }, [events]);
 
   return (
-    <div ref={root} className="mx-auto w-[min(94%,72rem)] pb-28 pt-36" style={{ perspective: 1200 }}>
-      <div className="text-center">
-        <h1 className="font-display text-4xl font-black md:text-5xl">
-          活动<span className="text-gradient">时间轴</span>
-        </h1>
-        <p className="mt-3 text-sm text-slate-400">沿着时间向下滚动，穿越我们走过的每一站</p>
-      </div>
-
-      <div className="relative mt-20">
+    <div ref={root} className="mx-auto w-[min(94%,72rem)] pb-28 pt-10" style={{ perspective: 1200 }}>
+      <div className="relative mt-8">
         {/* 中轴线 */}
-        <div className="absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-white/8 md:block">
+        <div className="absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-cocoa/8 md:block">
           <div
             ref={lineRef}
             className="h-full w-full origin-top bg-gradient-to-b from-leaf via-mint to-gold"
@@ -100,7 +95,7 @@ export default function Timeline({ events }: { events: VolunteerEvent[] }) {
                   }`}
                 />
                 <Link href={`/events/${e.slug}`} className="group block">
-                  <div className="overflow-hidden rounded-3xl border border-white/8">
+                  <div className="overflow-hidden rounded-3xl border border-cocoa/8">
                     <div className="tl-photo relative aspect-[16/9] scale-110 overflow-hidden">
                       <PhotoImg
                         seed={e.cover}
@@ -115,17 +110,17 @@ export default function Timeline({ events }: { events: VolunteerEvent[] }) {
                     <p className="text-xs font-semibold tracking-widest text-mint">
                       {e.date} · {e.location}
                     </p>
-                    <h2 className="mt-2 font-display text-2xl font-bold text-white transition-colors group-hover:text-gradient">
+                    <h2 className="mt-2 font-display text-2xl font-bold text-cocoa transition-colors group-hover:text-gradient">
                       {e.title}
                     </h2>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-400">{e.summary}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-mocha">{e.summary}</p>
                     <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
                       {e.tags.map((t) => (
-                        <span key={t} className="rounded-full border border-white/10 px-3 py-1 text-slate-300">
+                        <span key={t} className="rounded-full border border-cocoa/10 px-3 py-1 text-cocoa/80">
                           {t}
                         </span>
                       ))}
-                      <span className="text-slate-500">
+                      <span className="text-mocha/70">
                         {e.participants} 人参与 · {e.photos.length} 张照片
                       </span>
                     </div>

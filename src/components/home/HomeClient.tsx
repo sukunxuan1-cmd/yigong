@@ -7,7 +7,7 @@ const HeroJourney = dynamic(() => import("@/components/home/HeroJourney"), {
   ssr: false,
   loading: () => (
     <div className="flex h-screen items-center justify-center">
-      <p className="animate-pulse text-sm tracking-[0.4em] text-slate-500">点亮中…</p>
+      <p className="animate-pulse text-sm tracking-[0.4em] text-mocha/70">点亮中…</p>
     </div>
   ),
 });

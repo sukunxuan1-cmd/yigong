@@ -59,25 +59,25 @@ export default function Comments({ photoId }: { photoId: string }) {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className={depth ? "ml-10 border-l border-white/8 pl-4" : ""}
+      className={depth ? "ml-10 border-l border-cocoa/8 pl-4" : ""}
     >
       <div className="flex items-start gap-3 py-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-leaf/70 to-mint/70 text-sm font-bold text-white">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-leaf/70 to-mint/70 text-sm font-bold text-cocoa">
           {c.author.slice(0, 1)}
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm">
-            <span className="font-semibold text-white">{c.author}</span>
-            <span className="ml-2 text-xs text-slate-500">{timeAgo(c.createdAt)}</span>
+            <span className="font-semibold text-cocoa">{c.author}</span>
+            <span className="ml-2 text-xs text-mocha/70">{timeAgo(c.createdAt)}</span>
           </p>
-          <p className="mt-1 break-words text-sm leading-relaxed text-slate-300">{c.text}</p>
+          <p className="mt-1 break-words text-sm leading-relaxed text-cocoa/80">{c.text}</p>
           {depth === 0 && (
             <button
               onClick={() => {
                 setReplyTo(c);
                 inputRef.current?.focus();
               }}
-              className="mt-1 text-xs text-slate-500 transition-colors hover:text-mint"
+              className="mt-1 text-xs text-mocha/70 transition-colors hover:text-mint"
             >
               回复
             </button>
@@ -92,8 +92,8 @@ export default function Comments({ photoId }: { photoId: string }) {
 
   return (
     <section className="glass rounded-3xl p-6">
-      <h3 className="font-display text-lg font-bold text-white">
-        评论 <span className="text-sm font-normal text-slate-400">({comments.length})</span>
+      <h3 className="font-display text-lg font-bold text-cocoa">
+        评论 <span className="text-sm font-normal text-mocha">({comments.length})</span>
       </h3>
 
       <div className="mt-4">
@@ -105,11 +105,11 @@ export default function Comments({ photoId }: { photoId: string }) {
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
             >
-              <div className="mb-2 flex items-center justify-between rounded-xl bg-white/5 px-3 py-2 text-xs text-slate-400">
+              <div className="mb-2 flex items-center justify-between rounded-xl bg-cocoa/5 px-3 py-2 text-xs text-mocha">
                 <span className="truncate">
                   回复 <span className="text-mint">@{replyTo.author}</span>：{replyTo.text}
                 </span>
-                <button onClick={() => setReplyTo(null)} className="ml-3 shrink-0 hover:text-white">
+                <button onClick={() => setReplyTo(null)} className="ml-3 shrink-0 hover:text-cocoa">
                   取消 ✕
                 </button>
               </div>
@@ -122,7 +122,7 @@ export default function Comments({ photoId }: { photoId: string }) {
             onChange={(e) => setAuthor(e.target.value)}
             placeholder="你的名字"
             maxLength={16}
-            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-leaf/60 focus:outline-none sm:w-36"
+            className="w-full rounded-xl border border-cocoa/10 bg-cocoa/5 px-3 py-2 text-sm text-cocoa placeholder:text-mocha/70 focus:border-leaf/60 focus:outline-none sm:w-36"
           />
           <textarea
             ref={inputRef}
@@ -137,7 +137,7 @@ export default function Comments({ photoId }: { photoId: string }) {
             rows={1}
             maxLength={500}
             placeholder="写下你的感受…（Enter 发送）"
-            className="min-w-0 flex-1 resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-leaf/60 focus:outline-none"
+            className="min-w-0 flex-1 resize-none rounded-xl border border-cocoa/10 bg-cocoa/5 px-3 py-2 text-sm text-cocoa placeholder:text-mocha/70 focus:border-leaf/60 focus:outline-none"
           />
           <button
             onClick={submit}
@@ -149,9 +149,9 @@ export default function Comments({ photoId }: { photoId: string }) {
         </div>
       </div>
 
-      <div className="mt-4 divide-y divide-white/5">
+      <div className="mt-4 divide-y divide-cocoa/5">
         {tree.roots.length === 0 && (
-          <p className="py-6 text-center text-sm text-slate-500">还没有评论，来抢沙发～</p>
+          <p className="py-6 text-center text-sm text-mocha/70">还没有评论，来抢沙发～</p>
         )}
         {tree.roots.map((c) => (
           <Item key={c.id} c={c} depth={0} />

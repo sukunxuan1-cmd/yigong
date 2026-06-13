@@ -27,12 +27,12 @@ const smooth = (a: number, b: number, x: number) => {
 };
 
 // 复用的颜色常量（避免每帧 new）
-const C_FOG_A = new THREE.Color("#0a0f0c");
-const C_FOG_B = new THREE.Color("#1a1208");
-const C_BG_A = new THREE.Color("#04060a");
-const C_BG_B = new THREE.Color("#0c0a07");
-const C_AMB_A = new THREE.Color("#9fb4ff");
-const C_AMB_B = new THREE.Color("#ffd9b0");
+const C_FOG_A = new THREE.Color("#fff1e0");
+const C_FOG_B = new THREE.Color("#ffe6cf");
+const C_BG_A = new THREE.Color("#fff7ec");
+const C_BG_B = new THREE.Color("#ffeede");
+const C_AMB_A = new THREE.Color("#fff4e6");
+const C_AMB_B = new THREE.Color("#ffe7c8");
 
 /* ---------------------------- 纹理工具 ---------------------------- */
 
@@ -52,13 +52,62 @@ function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, w: numb
 
 type Overlay = (ctx: CanvasRenderingContext2D, w: number, h: number) => void;
 
-function makePhotoTexture(seed: number, src: string | undefined, w: number, h: number, overlay?: Overlay) {
+/** 圆角白边相框（拍立得感）：透明背景 + 白卡 + 圆角裁切照片 */
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+}
+
+function makePhotoTexture(
+  seed: number,
+  src: string | undefined,
+  w: number,
+  h: number,
+  overlay?: Overlay,
+  frame?: boolean
+) {
   const c = document.createElement("canvas");
   c.width = w;
   c.height = h;
   const ctx = c.getContext("2d")!;
-  ctx.drawImage(photoCanvas(seed), 0, 0, w, h);
-  overlay?.(ctx, w, h);
+
+  const paint = (source: HTMLImageElement | HTMLCanvasElement) => {
+    ctx.clearRect(0, 0, w, h);
+    if (frame) {
+      // 白色相框卡片 + 柔和投影
+      const m = Math.round(w * 0.035); // 外边距
+      const pad = Math.round(w * 0.03); // 白边宽度
+      const rad = Math.round(w * 0.05);
+      ctx.save();
+      ctx.shadowColor = "rgba(120,80,50,0.28)";
+      ctx.shadowBlur = w * 0.05;
+      ctx.shadowOffsetY = h * 0.02;
+      ctx.fillStyle = "#fffaf2";
+      roundRect(ctx, m, m, w - m * 2, h - m * 2, rad);
+      ctx.fill();
+      ctx.restore();
+      // 内部照片
+      const ix = m + pad;
+      const iy = m + pad;
+      const iw = w - (m + pad) * 2;
+      const ih = h - (m + pad) * 2;
+      ctx.save();
+      roundRect(ctx, ix, iy, iw, ih, rad * 0.6);
+      ctx.clip();
+      const sw = source instanceof HTMLImageElement ? source.naturalWidth || source.width : source.width;
+      const sh = source instanceof HTMLImageElement ? source.naturalHeight || source.height : source.height;
+      const scale = Math.max(iw / sw, ih / sh);
+      const dw = sw * scale;
+      const dh = sh * scale;
+      ctx.drawImage(source, ix + (iw - dw) / 2, iy + (ih - dh) / 2, dw, dh);
+      ctx.restore();
+    } else {
+      drawCover(ctx, source as HTMLImageElement, w, h);
+    }
+    overlay?.(ctx, w, h);
+  };
+
+  paint(photoCanvas(seed));
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
@@ -66,9 +115,7 @@ function makePhotoTexture(seed: number, src: string | undefined, w: number, h: n
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
-      ctx.clearRect(0, 0, w, h);
-      drawCover(ctx, img, w, h);
-      overlay?.(ctx, w, h);
+      paint(img);
       tex.needsUpdate = true;
     };
     img.src = src;
@@ -84,11 +131,11 @@ function makeLabelTexture(year: string, title: string) {
   c.height = h;
   const ctx = c.getContext("2d")!;
   ctx.textBaseline = "middle";
-  ctx.fillStyle = "#7edca4";
+  ctx.fillStyle = "#3bb273";
   ctx.font = "bold 64px system-ui, sans-serif";
   ctx.fillText(year, 8, h / 2);
   const yw = ctx.measureText(year).width;
-  ctx.fillStyle = "rgba(255,255,255,0.92)";
+  ctx.fillStyle = "rgba(74,56,46,0.92)";
   ctx.font = "44px system-ui, sans-serif";
   ctx.fillText(title, 8 + yw + 28, h / 2 + 2);
   const tex = new THREE.CanvasTexture(c);
@@ -105,13 +152,13 @@ function makeLogoTexture() {
   const ctx = c.getContext("2d")!;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.shadowColor = "rgba(126,220,164,0.55)";
-  ctx.shadowBlur = 38;
-  ctx.fillStyle = "#ffffff";
+  ctx.shadowColor = "rgba(255,159,126,0.45)";
+  ctx.shadowBlur = 30;
+  ctx.fillStyle = "#4a382e";
   ctx.font = "bold 200px system-ui, sans-serif";
   ctx.fillText("义工团", w / 2, h * 0.42);
   ctx.shadowBlur = 0;
-  ctx.fillStyle = "rgba(126,220,164,0.85)";
+  ctx.fillStyle = "rgba(59,178,115,0.95)";
   ctx.font = "600 52px system-ui, sans-serif";
   ctx.fillText("R E S H I N E   V O L U N T E E R", w / 2, h * 0.82);
   const tex = new THREE.CanvasTexture(c);
@@ -156,10 +203,10 @@ const heroFrag = /* glsl */ `
     vec2 uv = vUv + vDisp * 0.25;
     vec3 col = texture2D(uTex, uv).rgb;
     // 水波高光
-    col += vec3(0.55, 1.0, 0.7) * max(vDisp, 0.0) * 1.1 * (0.4 + uActive);
+    col += vec3(1.0, 0.85, 0.6) * max(vDisp, 0.0) * 1.0 * (0.4 + uActive);
     // 暗角
-    float vig = smoothstep(1.05, 0.45, distance(vUv, vec2(0.5)));
-    col *= 0.55 + 0.45 * vig;
+    float vig = smoothstep(1.1, 0.5, distance(vUv, vec2(0.5)));
+    col *= 0.88 + 0.12 * vig;
     gl_FragColor = vec4(col, uOpacity);
   }
 `;
@@ -190,7 +237,7 @@ function useScene(events: VolunteerEvent[]) {
       const y = Math.sin(i * 1.3) * 0.7;
       const scale = 0.9 + ((i * 7) % 5) * 0.12;
       return {
-        tex: makePhotoTexture(s.seed, s.src, 800, 533),
+        tex: makePhotoTexture(s.seed, s.src, 870, 580, undefined, true),
         label: makeLabelTexture(s.date.slice(0, 4), s.title),
         pos: [x, y, z] as [number, number, number],
         rotY: -side * 0.22,
@@ -220,11 +267,17 @@ function useScene(events: VolunteerEvent[]) {
       idx: i,
     }));
 
+    // 开场：照片退到两侧/上方，让出中央的 logo
+    const act0Layout: { pos: [number, number, number]; rot: number; scale: number }[] = [
+      { pos: [-4.9, 1.2, -2.4], rot: 0.16, scale: 0.85 },
+      { pos: [-3.5, -1.5, -3.4], rot: 0.1, scale: 0.78 },
+      { pos: [4.9, 1.0, -2.6], rot: -0.16, scale: 0.85 },
+      { pos: [3.5, -1.6, -3.2], rot: -0.1, scale: 0.78 },
+      { pos: [0, 2.5, -3.8], rot: 0, scale: 0.72 },
+    ];
     const act0 = pick(5).map((s, i) => ({
-      tex: makePhotoTexture(s.seed, s.src, 512, 341),
-      pos: [Math.cos(i * 1.7) * 3.2, Math.sin(i * 2.1) * 1.8, -0.5 - i * 0.9] as [number, number, number],
-      rot: (i - 2) * 0.18,
-      scale: 0.8 + (i % 3) * 0.18,
+      tex: makePhotoTexture(s.seed, s.src, 600, 400, undefined, true),
+      ...act0Layout[i],
     }));
 
     return { heroTex, corridor, stack, act0, logoTex: makeLogoTexture() };
@@ -273,6 +326,7 @@ function Scene({
   const logoRef = useRef<THREE.Mesh>(null);
   const act0Refs = useRef<THREE.Mesh[]>([]);
   const labelRefs = useRef<THREE.Mesh[]>([]);
+  const corridorGroupRef = useRef<THREE.Group>(null);
   const stackRefs = useRef<THREE.Group[]>([]);
   const ambientRef = useRef<THREE.AmbientLight>(null);
   const spotRef = useRef<THREE.SpotLight>(null);
@@ -329,7 +383,7 @@ function Scene({
 
     /* —— 灯光 / 雾 —— */
     if (ambientRef.current) {
-      ambientRef.current.intensity = 0.05 + smooth(0.04, 0.22, p) * 0.5;
+      ambientRef.current.intensity = 0.55 + smooth(0.04, 0.22, p) * 0.5;
       ambientRef.current.color.lerpColors(C_AMB_A, C_AMB_B, smooth(0.25, 0.7, p));
     }
     if (spotRef.current) {
@@ -388,6 +442,9 @@ function Scene({
       titleRef.current.style.transform = `translateY(${(p - 0.22) * -140}px)`;
     }
 
+    /* —— 第二幕 长廊：仅在接近/进入长廊时显示，避免开场遮挡 logo —— */
+    if (corridorGroupRef.current) corridorGroupRef.current.visible = p > 0.24;
+
     /* —— 第二幕 标签淡入 —— */
     const reveal = smooth(0.3, 0.42, p);
     labelRefs.current.forEach((mesh) => {
@@ -416,8 +473,8 @@ function Scene({
 
   return (
     <>
-      <color ref={bgRef} attach="background" args={["#04060a"]} />
-      <fogExp2 ref={fogRef} attach="fog" args={["#0a0f0c", 0]} />
+      <color ref={bgRef} attach="background" args={["#fff7ec"]} />
+      <fogExp2 ref={fogRef} attach="fog" args={["#fff1e0", 0]} />
       <ambientLight ref={ambientRef} intensity={0.05} />
       <spotLight
         ref={spotRef}
@@ -432,7 +489,7 @@ function Scene({
       <pointLight ref={tableRef} position={[0, 6, -31]} color="#fff0d8" distance={30} intensity={0} />
 
       {/* 第〇幕 logo */}
-      <mesh ref={logoRef} position={[0, 0.45, 0]}>
+      <mesh ref={logoRef} position={[0, 0.45, 2.6]}>
         <planeGeometry args={[3.2, 1.3]} />
         <meshStandardMaterial map={logoTex} transparent emissive="#9fe6c0" emissiveIntensity={0.15} />
       </mesh>
@@ -446,8 +503,8 @@ function Scene({
           rotation={[0, a.rot, 0]}
           scale={a.scale}
         >
-          <planeGeometry args={[2.2, 1.46]} />
-          <meshStandardMaterial map={a.tex} transparent roughness={0.85} />
+          <planeGeometry args={[2.4, 1.6]} />
+          <meshStandardMaterial map={a.tex} transparent alphaTest={0.5} roughness={0.85} />
         </mesh>
       ))}
 
@@ -457,29 +514,31 @@ function Scene({
         <primitive object={heroMat} attach="material" />
       </mesh>
 
-      {/* 第二幕 长廊 */}
-      {corridor.map((c, i) => (
-        <group key={i} position={c.pos} rotation={[0, c.rotY, 0]}>
-          <mesh scale={c.scale}>
-            <planeGeometry args={[2.6, 1.73]} />
-            <meshStandardMaterial map={c.tex} roughness={0.9} side={THREE.DoubleSide} />
-          </mesh>
-          <mesh
-            position={[0, -1.05 * c.scale, 0.02]}
-            ref={(el) => {
-              if (el) labelRefs.current[i] = el;
-            }}
-          >
-            <planeGeometry args={[2.4, 0.5]} />
-            <meshBasicMaterial map={c.label} transparent opacity={0} depthWrite={false} />
-          </mesh>
-        </group>
-      ))}
+      {/* 第二幕 长廊（开场/Hero 阶段整体隐藏，进入长廊才浮现） */}
+      <group ref={corridorGroupRef}>
+        {corridor.map((c, i) => (
+          <group key={i} position={c.pos} rotation={[0, c.rotY, 0]}>
+            <mesh scale={c.scale}>
+              <planeGeometry args={[2.6, 1.73]} />
+              <meshStandardMaterial map={c.tex} transparent alphaTest={0.5} roughness={0.9} side={THREE.DoubleSide} />
+            </mesh>
+            <mesh
+              position={[0, -1.05 * c.scale, 0.02]}
+              ref={(el) => {
+                if (el) labelRefs.current[i] = el;
+              }}
+            >
+              <planeGeometry args={[2.4, 0.5]} />
+              <meshBasicMaterial map={c.label} transparent opacity={0} depthWrite={false} />
+            </mesh>
+          </group>
+        ))}
+      </group>
 
       {/* 第三幕 桌面 + 卡片堆（桌面尺寸收小，且仅第三幕淡入） */}
       <mesh ref={tableMeshRef} position={[0, -0.35, -33]} rotation={[-Math.PI / 2, 0, 0]} visible={false}>
         <planeGeometry args={[16, 12]} />
-        <meshStandardMaterial color="#0d1310" roughness={1} transparent opacity={0} />
+        <meshStandardMaterial color="#ecd6bb" roughness={1} transparent opacity={0} />
       </mesh>
       {stack.map((s, i) => (
         <group
@@ -516,7 +575,7 @@ export default function HeroJourney({ events }: { events: VolunteerEvent[] }) {
           <Scroll html style={{ width: "100%" }}>
             {/* 叙事在 offset≈0.78（≈390vh）结束，板块在 405vh 升起，仅在转暗的第三幕末尾露出 */}
             <div style={{ position: "absolute", top: "405vh", width: "100vw" }}>
-              <div className="bg-gradient-to-b from-transparent via-ink/90 to-ink pt-28">
+              <div className="bg-gradient-to-b from-transparent via-cream/85 to-cream pt-28">
                 <HomeSections events={events} embedded />
               </div>
             </div>
@@ -530,16 +589,18 @@ export default function HeroJourney({ events }: { events: VolunteerEvent[] }) {
         className="pointer-events-none fixed inset-0 z-30 flex flex-col items-center justify-center px-6 text-center"
         style={{ opacity: 0, visibility: "hidden" }}
       >
-        <p className="mb-4 text-sm tracking-[0.5em] text-mint/80">RESHINE 义工团</p>
-        <h1 className="font-display text-6xl font-black leading-[1.05] text-white drop-shadow-[0_4px_30px_rgba(0,0,0,0.7)] md:text-8xl">
-          记录每一次
-          <br />
-          <span className="text-gradient">微光与善行</span>
-        </h1>
-        <p className="mt-6 max-w-md text-base text-slate-300/90">滚动，跟随镜头穿过我们走过的每一站</p>
+        <div className="rounded-[2.5rem] bg-cream/55 px-10 py-8 backdrop-blur-md">
+          <p className="mb-4 text-sm font-semibold tracking-[0.5em] text-leaf">RESHINE 义工团</p>
+          <h1 className="font-display text-6xl font-black leading-[1.05] text-cocoa drop-shadow-[0_2px_16px_rgba(255,247,236,0.9)] md:text-8xl">
+            记录每一次
+            <br />
+            <span className="text-gradient">微光与善行</span>
+          </h1>
+          <p className="mt-6 text-base text-mocha">滚动，跟随镜头穿过我们走过的每一站 🌿</p>
+        </div>
       </div>
 
-      <div className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-[0.3em] text-slate-500">
+      <div className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-[0.3em] text-mocha/70">
         SCROLL ↓
       </div>
     </div>

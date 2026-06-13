@@ -7,6 +7,8 @@ export type Member = {
   activities: number;
   motto: string;
   palette: [string, string];
+  /** TA 参与过的活动 slug 列表 */
+  events: string[];
   /** 一段简介，显示在成员详情页 */
   bio: string;
   /** 头像图：放在 public/members/<id>.jpg，留空则用首字渐变占位 */
@@ -38,16 +40,16 @@ export type VolunteerEvent = {
 };
 
 export const members: Member[] = [
-  { id: "m1", name: "林晓雨", role: "团长", department: "人力资源部", joined: "2021-03", activities: 42, motto: "微光成炬，温暖同行。", palette: ["#1fa45c", "#7edca4"], bio: "义工团的发起人之一。2021 年，她在公司内部发出第一封招募邮件，从 7 个人的小队伍做到今天数十人的规模。她相信公益不是一时热血，而是一种可以长久坚持的生活方式——五年来，几乎每一次活动的统筹都有她的身影。", photo: "/members/m1.jpg" },
-  { id: "m2", name: "陈则铭", role: "副团长", department: "技术研发部", joined: "2021-05", activities: 38, motto: "代码改变世界，行动温暖人心。", palette: ["#15803d", "#b9e6cb"], bio: "技术研发部工程师，义工团的“技术担当”。报名表、签到系统，乃至这个活动记录网站，都是他利用业余时间一行行搭起来的。他常说：能用代码解决的事，就别让大家多跑腿。", photo: "/members/m2.jpg" },
-  { id: "m3", name: "苏婉清", role: "活动策划", department: "市场部", joined: "2021-09", activities: 35, motto: "每一次出发，都值得被记录。", palette: ["#2fb874", "#0f6b3e"], bio: "市场部出身，把策划活动的本事全用在了公益上。从场地对接、流程设计到物料准备，她总能把一次活动安排得井井有条，让每位义工一到现场就知道自己该做什么。", photo: "/members/m3.jpg" },
-  { id: "m4", name: "赵启航", role: "物资管理", department: "运营部", joined: "2022-01", activities: 29, motto: "把小事做好，就是大事。", palette: ["#e6b85c", "#1fa45c"], bio: "运营部的“大管家”，负责每次活动的物资调度。几千份礼包、上万杯饮用水，在他手里从不出错。他习惯提前一周列好清单，反复核对到最后一刻。", photo: "/members/m4.jpg" },
-  { id: "m5", name: "何静怡", role: "摄影记录", department: "设计部", joined: "2022-04", activities: 31, motto: "用镜头留住每个善意瞬间。", palette: ["#4cc98a", "#155e38"], bio: "设计部的摄影师，义工团绝大多数照片都出自她的镜头。她总说自己只是“按下快门的人”，却为每一次善行留下了最动人的瞬间——这个网站里的很多画面，都来自她的记录。", photo: "/members/m5.jpg" },
-  { id: "m6", name: "吴天乐", role: "安全保障", department: "行政部", joined: "2022-06", activities: 26, motto: "守护好每一位伙伴。", palette: ["#7edca4", "#1fa45c"], bio: "行政部的安全员，每次外出活动他都走在最前、守在最后。清点人数、规划路线、准备应急药箱，是他雷打不动的习惯。有他在，大家都安心。", photo: "/members/m6.jpg" },
-  { id: "m7", name: "郑沛霖", role: "外联协调", department: "公共关系部", joined: "2022-10", activities: 22, motto: "连接善意，传递力量。", palette: ["#9fc97a", "#2a7d4f"], bio: "公关部的“外交官”，负责对接敬老院、学校、血站等合作方。许多活动能顺利落地，靠的是他一次次耐心的沟通与协调。", photo: "/members/m7.jpg" },
-  { id: "m8", name: "杜若曦", role: "财务监督", department: "财务部", joined: "2023-02", activities: 18, motto: "每一分善款都清清楚楚。", palette: ["#0f7a45", "#8be0b3"], bio: "财务部的“铁面账房”。每一笔善款、每一次采购，她都记得清清楚楚并定期公示。她坚信，透明是公益最基本的底线。", photo: "/members/m8.jpg" },
-  { id: "m9", name: "高一帆", role: "新媒体运营", department: "品牌部", joined: "2023-05", activities: 15, motto: "让更多人看见，让更多人加入。", palette: ["#36b06d", "#d9c08a"], bio: "品牌部的新媒体运营，义工团对外的“声音”。活动招募、回顾推送、暖心瞬间，都经她的手传播出去，吸引了越来越多同事加入。", photo: "/members/m9.jpg" },
-  { id: "m10", name: "孙若楠", role: "培训讲师", department: "培训发展部", joined: "2023-08", activities: 12, motto: "授人以渔，温暖以心。", palette: ["#1c9355", "#a8e6c2"], bio: "培训发展部讲师，负责新义工的入团培训。从服务礼仪到应急处理，她把每一课都讲得细致又温暖，是许多人公益路上的第一位引路人。", photo: "/members/m10.jpg" },
+  { id: "m1", name: "林晓雨", role: "团长", department: "人力资源部", joined: "2021-03", activities: 42, motto: "微光成炬，温暖同行。", palette: ["#1fa45c", "#7edca4"], events: ["riverside-cleanup-2024", "elderly-home-visit-2024", "mountain-school-library-2024", "city-marathon-support-2024", "warm-winter-donation-2025", "blood-donation-2025"], bio: "义工团的发起人之一。2021 年，她在公司内部发出第一封招募邮件，从 7 个人的小队伍做到今天数十人的规模。她相信公益不是一时热血，而是一种可以长久坚持的生活方式——五年来，几乎每一次活动的统筹都有她的身影。", photo: "/members/m1.jpg" },
+  { id: "m2", name: "陈则铭", role: "副团长", department: "技术研发部", joined: "2021-05", activities: 38, motto: "代码改变世界，行动温暖人心。", palette: ["#15803d", "#b9e6cb"], events: ["riverside-cleanup-2024", "elderly-home-visit-2024", "mountain-school-library-2024", "city-marathon-support-2024", "warm-winter-donation-2025", "blood-donation-2025"], bio: "技术研发部工程师，义工团的“技术担当”。报名表、签到系统，乃至这个活动记录网站，都是他利用业余时间一行行搭起来的。他常说：能用代码解决的事，就别让大家多跑腿。", photo: "/members/m2.jpg" },
+  { id: "m3", name: "苏婉清", role: "活动策划", department: "市场部", joined: "2021-09", activities: 35, motto: "每一次出发，都值得被记录。", palette: ["#2fb874", "#0f6b3e"], events: ["riverside-cleanup-2024", "elderly-home-visit-2024", "mountain-school-library-2024", "city-marathon-support-2024", "warm-winter-donation-2025", "blood-donation-2025"], bio: "市场部出身，把策划活动的本事全用在了公益上。从场地对接、流程设计到物料准备，她总能把一次活动安排得井井有条，让每位义工一到现场就知道自己该做什么。", photo: "/members/m3.jpg" },
+  { id: "m4", name: "赵启航", role: "物资管理", department: "运营部", joined: "2022-01", activities: 29, motto: "把小事做好，就是大事。", palette: ["#e6b85c", "#1fa45c"], events: ["riverside-cleanup-2024", "city-marathon-support-2024", "warm-winter-donation-2025", "blood-donation-2025"], bio: "运营部的“大管家”，负责每次活动的物资调度。几千份礼包、上万杯饮用水，在他手里从不出错。他习惯提前一周列好清单，反复核对到最后一刻。", photo: "/members/m4.jpg" },
+  { id: "m5", name: "何静怡", role: "摄影记录", department: "设计部", joined: "2022-04", activities: 31, motto: "用镜头留住每个善意瞬间。", palette: ["#4cc98a", "#155e38"], events: ["riverside-cleanup-2024", "elderly-home-visit-2024", "mountain-school-library-2024", "city-marathon-support-2024", "warm-winter-donation-2025", "blood-donation-2025"], bio: "设计部的摄影师，义工团绝大多数照片都出自她的镜头。她总说自己只是“按下快门的人”，却为每一次善行留下了最动人的瞬间——这个网站里的很多画面，都来自她的记录。", photo: "/members/m5.jpg" },
+  { id: "m6", name: "吴天乐", role: "安全保障", department: "行政部", joined: "2022-06", activities: 26, motto: "守护好每一位伙伴。", palette: ["#7edca4", "#1fa45c"], events: ["riverside-cleanup-2024", "elderly-home-visit-2024", "city-marathon-support-2024", "blood-donation-2025"], bio: "行政部的安全员，每次外出活动他都走在最前、守在最后。清点人数、规划路线、准备应急药箱，是他雷打不动的习惯。有他在，大家都安心。", photo: "/members/m6.jpg" },
+  { id: "m7", name: "郑沛霖", role: "外联协调", department: "公共关系部", joined: "2022-10", activities: 22, motto: "连接善意，传递力量。", palette: ["#9fc97a", "#2a7d4f"], events: ["elderly-home-visit-2024", "mountain-school-library-2024", "warm-winter-donation-2025", "blood-donation-2025"], bio: "公关部的“外交官”，负责对接敬老院、学校、血站等合作方。许多活动能顺利落地，靠的是他一次次耐心的沟通与协调。", photo: "/members/m7.jpg" },
+  { id: "m8", name: "杜若曦", role: "财务监督", department: "财务部", joined: "2023-02", activities: 18, motto: "每一分善款都清清楚楚。", palette: ["#0f7a45", "#8be0b3"], events: ["mountain-school-library-2024", "warm-winter-donation-2025", "blood-donation-2025"], bio: "财务部的“铁面账房”。每一笔善款、每一次采购，她都记得清清楚楚并定期公示。她坚信，透明是公益最基本的底线。", photo: "/members/m8.jpg" },
+  { id: "m9", name: "高一帆", role: "新媒体运营", department: "品牌部", joined: "2023-05", activities: 15, motto: "让更多人看见，让更多人加入。", palette: ["#36b06d", "#d9c08a"], events: ["riverside-cleanup-2024", "elderly-home-visit-2024", "city-marathon-support-2024", "blood-donation-2025"], bio: "品牌部的新媒体运营，义工团对外的“声音”。活动招募、回顾推送、暖心瞬间，都经她的手传播出去，吸引了越来越多同事加入。", photo: "/members/m9.jpg" },
+  { id: "m10", name: "孙若楠", role: "培训讲师", department: "培训发展部", joined: "2023-08", activities: 12, motto: "授人以渔，温暖以心。", palette: ["#1c9355", "#a8e6c2"], events: ["elderly-home-visit-2024", "mountain-school-library-2024", "warm-winter-donation-2025"], bio: "培训发展部讲师，负责新义工的入团培训。从服务礼仪到应急处理，她把每一课都讲得细致又温暖，是许多人公益路上的第一位引路人。", photo: "/members/m10.jpg" },
 ];
 
 export const events: VolunteerEvent[] = [
@@ -170,12 +172,102 @@ export const events: VolunteerEvent[] = [
   },
 ];
 
+/** 即将开展、开放报名的活动 */
+export type UpcomingEvent = {
+  id: string;
+  title: string;
+  date: string;
+  location: string;
+  summary: string;
+  tags: string[];
+  slots: number; // 招募名额
+  cover: number; // 占位图 seed
+};
+
+export const upcomingEvents: UpcomingEvent[] = [
+  {
+    id: "tree-planting-2026-spring",
+    title: "春季城市植树日",
+    date: "2026-03-12",
+    location: "城北生态林场",
+    summary: "认领并种下属于我们的一片“义工林”，为城市再添一抹绿。",
+    tags: ["环保", "植树"],
+    slots: 50,
+    cover: 102,
+  },
+  {
+    id: "autism-care-2026",
+    title: "“来自星星的孩子”陪伴日",
+    date: "2026-04-19",
+    location: "市特殊教育中心",
+    summary: "一对一陪伴自闭症儿童做游戏、画画，用耐心点亮星星。",
+    tags: ["关爱", "陪伴"],
+    slots: 30,
+    cover: 203,
+  },
+  {
+    id: "community-clinic-2026",
+    title: "社区义诊与健康科普",
+    date: "2026-05-24",
+    location: "阳光社区广场",
+    summary: "协助医生开展免费义诊，为居民测量血压血糖、发放健康手册。",
+    tags: ["健康", "社区"],
+    slots: 25,
+    cover: 602,
+  },
+];
+
+export function getUpcoming(id: string) {
+  return upcomingEvents.find((e) => e.id === id);
+}
+
+/** 全站影响力统计（用于数据看板） */
+export function impactStats() {
+  const totalEvents = events.length;
+  const totalParticipants = events.reduce((s, e) => s + e.participants, 0);
+  const totalHours = events.reduce((s, e) => s + e.participants * e.hours, 0);
+  const totalPhotos = events.reduce((s, e) => s + e.photos.length, 0);
+
+  const byYear = new Map<string, { events: number; participants: number; hours: number }>();
+  for (const e of events) {
+    const y = e.date.slice(0, 4);
+    const cur = byYear.get(y) ?? { events: 0, participants: 0, hours: 0 };
+    cur.events += 1;
+    cur.participants += e.participants;
+    cur.hours += e.participants * e.hours;
+    byYear.set(y, cur);
+  }
+
+  const byTag = new Map<string, number>();
+  for (const e of events) for (const t of e.tags) byTag.set(t, (byTag.get(t) ?? 0) + 1);
+
+  return {
+    totalEvents,
+    totalParticipants,
+    totalHours,
+    totalPhotos,
+    members: members.length,
+    byYear: [...byYear.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([year, v]) => ({ year, ...v })),
+    byTag: [...byTag.entries()].sort((a, b) => b[1] - a[1]).map(([tag, count]) => ({ tag, count })),
+  };
+}
+
+/** 所有活动标签（去重） */
+export const allTags = [...new Set(events.flatMap((e) => e.tags))];
+/** 所有活动年份（去重，倒序） */
+export const allYears = [...new Set(events.map((e) => e.date.slice(0, 4)))].sort((a, b) => b.localeCompare(a));
+
 export function getEvent(slug: string) {
   return events.find((e) => e.slug === slug);
 }
 
 export function getMember(id: string) {
   return members.find((m) => m.id === id);
+}
+
+/** 某活动的参与成员 */
+export function membersOfEvent(slug: string) {
+  return members.filter((m) => m.events.includes(slug));
 }
 
 export const allPhotoSeeds = events.flatMap((e) => e.photos.map((p) => p.seed));

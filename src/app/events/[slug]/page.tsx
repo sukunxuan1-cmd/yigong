@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { events } from "@/lib/data";
+import { events, membersOfEvent } from "@/lib/data";
 import { getEventBySlug } from "@/lib/serverPhotos";
 import EventDetailClient from "@/components/event/EventDetailClient";
 
@@ -15,7 +15,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const event = getEventBySlug(slug);
-  return { title: event ? `${event.title} · Reshine 义工团` : "活动详情" };
+  if (!event) return { title: "活动详情" };
+  return {
+    title: `${event.title} · Reshine 义工团`,
+    description: event.summary,
+    openGraph: {
+      title: event.title,
+      description: event.summary,
+      images: event.coverSrc ? [event.coverSrc] : undefined,
+    },
+  };
 }
 
 export default async function EventDetailPage({
@@ -26,5 +35,5 @@ export default async function EventDetailPage({
   const { slug } = await params;
   const event = getEventBySlug(slug);
   if (!event) notFound();
-  return <EventDetailClient event={event} />;
+  return <EventDetailClient event={event} members={membersOfEvent(slug)} />;
 }
