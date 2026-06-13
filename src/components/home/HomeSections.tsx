@@ -14,13 +14,23 @@ const fadeUp = {
   }),
 };
 
-export default function HomeSections({ events }: { events: VolunteerEvent[] }) {
+export default function HomeSections({
+  events,
+  embedded = false,
+}: {
+  events: VolunteerEvent[];
+  embedded?: boolean;
+}) {
   const stats = [
     { label: "义工成员", value: members.length, suffix: "位" },
     { label: "公益活动", value: events.length, suffix: "场" },
     { label: "累计人次", value: events.reduce((s, e) => s + e.participants, 0), suffix: "+" },
     { label: "志愿时长", value: events.reduce((s, e) => s + e.participants * e.hours, 0), suffix: "小时" },
   ];
+  // 嵌在 drei <Scroll html> 里时，IntersectionObserver 不可靠，直接展示
+  const reveal = embedded
+    ? { initial: "show" as const, animate: "show" as const }
+    : { initial: "hidden" as const, whileInView: "show" as const, viewport: { once: true, margin: "-60px" } };
   return (
     <div className="relative z-10 mx-auto w-[min(92%,72rem)] pb-24">
       {/* 数据统计 */}
@@ -30,9 +40,7 @@ export default function HomeSections({ events }: { events: VolunteerEvent[] }) {
             key={s.label}
             custom={i}
             variants={fadeUp}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: "-80px" }}
+            {...reveal}
             className="glass glow-ring rounded-3xl p-6 text-center"
           >
             <p className="font-display text-4xl font-black text-gradient">
@@ -49,23 +57,14 @@ export default function HomeSections({ events }: { events: VolunteerEvent[] }) {
         <motion.h2
           variants={fadeUp}
           custom={0}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
+          {...reveal}
           className="font-display text-3xl font-bold"
         >
           最近的<span className="text-gradient">出发</span>
         </motion.h2>
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           {[...events].reverse().slice(0, 3).map((e, i) => (
-            <motion.div
-              key={e.slug}
-              custom={i}
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: "-60px" }}
-            >
+            <motion.div key={e.slug} custom={i} variants={fadeUp} {...reveal}>
               <Link
                 href={`/events/${e.slug}`}
                 className="group block overflow-hidden rounded-3xl border border-white/8 bg-haze transition-transform hover:-translate-y-1.5"
