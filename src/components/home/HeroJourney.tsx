@@ -504,7 +504,7 @@ function Scene({
           scale={a.scale}
         >
           <planeGeometry args={[2.4, 1.6]} />
-          <meshStandardMaterial map={a.tex} transparent alphaTest={0.5} roughness={0.85} />
+          <meshBasicMaterial map={a.tex} transparent alphaTest={0.5} />
         </mesh>
       ))}
 
@@ -520,7 +520,7 @@ function Scene({
           <group key={i} position={c.pos} rotation={[0, c.rotY, 0]}>
             <mesh scale={c.scale}>
               <planeGeometry args={[2.6, 1.73]} />
-              <meshStandardMaterial map={c.tex} transparent alphaTest={0.5} roughness={0.9} side={THREE.DoubleSide} />
+              <meshBasicMaterial map={c.tex} transparent alphaTest={0.5} side={THREE.DoubleSide} />
             </mesh>
             <mesh
               position={[0, -1.05 * c.scale, 0.02]}
@@ -551,7 +551,7 @@ function Scene({
         >
           <mesh>
             <planeGeometry args={[4.2, 2.76]} />
-            <meshStandardMaterial map={s.tex} transparent roughness={0.8} side={THREE.DoubleSide} />
+            <meshBasicMaterial map={s.tex} transparent side={THREE.DoubleSide} />
           </mesh>
         </group>
       ))}
