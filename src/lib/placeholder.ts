@@ -19,12 +19,12 @@ function mulberry32(seed: number) {
 }
 
 const PALETTES: [string, string, string][] = [
-  ["#1b2a6b", "#43e8d8", "#7c6cff"],
-  ["#5b1b3c", "#ff5e8a", "#ffc861"],
-  ["#0e3b43", "#7cf29c", "#43e8d8"],
-  ["#2a1b5b", "#7c6cff", "#ff8a5e"],
-  ["#402309", "#ffc861", "#ff5e8a"],
-  ["#0c2f52", "#5ec9ff", "#c86cff"],
+  ["#0d3b24", "#7edca4", "#1fa45c"],
+  ["#1d3a2a", "#b9e6cb", "#36b06d"],
+  ["#13301f", "#4cc98a", "#9fc97a"],
+  ["#27381e", "#a8d97a", "#2a7d4f"],
+  ["#3a2e17", "#e6b85c", "#7aa05a"],
+  ["#16352f", "#6ecfb0", "#2fb874"],
 ];
 
 export function photoCanvas(seed: number, w = 1024, h = 683): HTMLCanvasElement {

@@ -55,7 +55,7 @@ const fragmentShader = /* glsl */ `
     );
     vec4 col = mix(a, b, m);
     // 前沿发光
-    col.rgb += vec3(0.5, 0.45, 1.0) * front * 0.12;
+    col.rgb += vec3(0.45, 1.0, 0.65) * front * 0.12;
     gl_FragColor = col;
   }
 `;

@@ -2,15 +2,8 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { events, members } from "@/lib/data";
+import { members, type VolunteerEvent } from "@/lib/data";
 import PhotoImg from "@/components/PhotoImg";
-
-const stats = [
-  { label: "义工成员", value: members.length, suffix: "位" },
-  { label: "公益活动", value: events.length, suffix: "场" },
-  { label: "累计人次", value: events.reduce((s, e) => s + e.participants, 0), suffix: "+" },
-  { label: "志愿时长", value: events.reduce((s, e) => s + e.participants * e.hours, 0), suffix: "小时" },
-];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -21,7 +14,13 @@ const fadeUp = {
   }),
 };
 
-export default function HomeSections() {
+export default function HomeSections({ events }: { events: VolunteerEvent[] }) {
+  const stats = [
+    { label: "义工成员", value: members.length, suffix: "位" },
+    { label: "公益活动", value: events.length, suffix: "场" },
+    { label: "累计人次", value: events.reduce((s, e) => s + e.participants, 0), suffix: "+" },
+    { label: "志愿时长", value: events.reduce((s, e) => s + e.participants * e.hours, 0), suffix: "小时" },
+  ];
   return (
     <div className="relative z-10 mx-auto w-[min(92%,72rem)] pb-24">
       {/* 数据统计 */}
@@ -74,11 +73,12 @@ export default function HomeSections() {
                 <div className="relative aspect-[3/2] overflow-hidden">
                   <PhotoImg
                     seed={e.cover}
+                    src={e.coverSrc}
                     alt={e.title}
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-ink/90 to-transparent" />
-                  <p className="absolute bottom-3 left-4 text-xs text-aqua">{e.date} · {e.location}</p>
+                  <p className="absolute bottom-3 left-4 text-xs text-mint">{e.date} · {e.location}</p>
                 </div>
                 <div className="p-5">
                   <h3 className="font-semibold text-white group-hover:text-gradient">{e.title}</h3>
@@ -97,7 +97,7 @@ export default function HomeSections() {
           </Link>
           <Link
             href="/members"
-            className="rounded-2xl border border-white/10 px-6 py-3 text-sm font-semibold text-slate-300 transition-colors hover:border-neon/60 hover:text-white"
+            className="rounded-2xl border border-white/10 px-6 py-3 text-sm font-semibold text-slate-300 transition-colors hover:border-leaf/60 hover:text-white"
           >
             认识义工团成员
           </Link>

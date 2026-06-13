@@ -136,7 +136,7 @@ function rowToComment(r: any): CommentItem {
 /* ------------- 本地实现（无后端时的演示模式，跨标签页实时） ------------- */
 
 const SEED_DANMAKU = ["太有爱了！", "为义工团点赞 👍", "这一幕好感动", "我也想参加下次活动！", "辛苦啦各位", "正能量满满", "泪目了", "好样的！"];
-const SEED_COLORS = ["#ffffff", "#43e8d8", "#ffc861", "#ff5e8a", "#7cf29c"];
+const SEED_COLORS = ["#ffffff", "#7edca4", "#e6b85c", "#ffb3c7", "#b9e6cb"];
 
 class LocalStore implements InteractionStore {
   private channel: BroadcastChannel | null = null;

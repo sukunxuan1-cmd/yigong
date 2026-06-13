@@ -16,7 +16,7 @@ type Heart = {
   color: string;
 };
 
-const HEART_COLORS = ["#ff5e8a", "#ff8ab0", "#ffc861", "#7c6cff", "#43e8d8"];
+const HEART_COLORS = ["#ff5e8a", "#ff8ab0", "#e6b85c", "#7edca4", "#ffffff"];
 
 function drawHeart(ctx: CanvasRenderingContext2D, size: number) {
   const s = size / 2;

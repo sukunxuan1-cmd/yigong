@@ -5,27 +5,57 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { events } from "@/lib/data";
 import { photoCanvas } from "@/lib/placeholder";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+export type HeroSlide = { seed: number; src?: string; title: string; date: string };
+
 const GRID_W = 180;
 const GRID_H = 120;
 const COUNT = GRID_W * GRID_H;
 
-const heroSlides = events.map((e) => ({ seed: e.cover, title: e.title, date: e.date }));
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
 
-/** 把每张照片在网格分辨率下的像素颜色采出来 */
-function samplePhotos(): Float32Array[] {
+/** 把每张照片在网格分辨率下的像素颜色采出来（cover 裁切，支持真实照片） */
+async function samplePhotos(slides: HeroSlide[]): Promise<Float32Array[]> {
   const off = document.createElement("canvas");
   off.width = GRID_W;
   off.height = GRID_H;
   const ctx = off.getContext("2d", { willReadFrequently: true })!;
-  return heroSlides.map(({ seed }) => {
-    ctx.drawImage(photoCanvas(seed), 0, 0, GRID_W, GRID_H);
+
+  const sources = await Promise.all(
+    slides.map(async (s) => {
+      if (s.src) {
+        try {
+          return await loadImage(s.src);
+        } catch {
+          /* 加载失败回退占位图 */
+        }
+      }
+      return photoCanvas(s.seed);
+    })
+  );
+
+  return sources.map((source) => {
+    const sw = source instanceof HTMLImageElement ? source.naturalWidth : source.width;
+    const sh = source instanceof HTMLImageElement ? source.naturalHeight : source.height;
+    // cover 裁切到网格比例
+    const scale = Math.max(GRID_W / sw, GRID_H / sh);
+    const cw = GRID_W / scale;
+    const chh = GRID_H / scale;
+    ctx.clearRect(0, 0, GRID_W, GRID_H);
+    ctx.drawImage(source, (sw - cw) / 2, (sh - chh) / 2, cw, chh, 0, 0, GRID_W, GRID_H);
     const px = ctx.getImageData(0, 0, GRID_W, GRID_H).data;
     const colors = new Float32Array(COUNT * 3);
     for (let y = 0; y < GRID_H; y++) {
@@ -107,11 +137,37 @@ const fragmentShader = /* glsl */ `
   }
 `;
 
-function Particles({ progressRef }: { progressRef: React.MutableRefObject<number> }) {
+function Particles({
+  slides,
+  progressRef,
+}: {
+  slides: HeroSlide[];
+  progressRef: React.MutableRefObject<number>;
+}) {
+  const [photos, setPhotos] = useState<Float32Array[] | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    samplePhotos(slides).then((c) => alive && setPhotos(c));
+    return () => {
+      alive = false;
+    };
+  }, [slides]);
+
+  if (!photos) return null;
+  return <ParticleCloud photos={photos} progressRef={progressRef} />;
+}
+
+function ParticleCloud({
+  photos,
+  progressRef,
+}: {
+  photos: Float32Array[];
+  progressRef: React.MutableRefObject<number>;
+}) {
   const matRef = useRef<THREE.ShaderMaterial>(null);
   const geoRef = useRef<THREE.BufferGeometry>(null);
   const { viewport } = useThree();
-  const photos = useMemo(samplePhotos, []);
   const segmentRef = useRef(0);
   const mouse = useRef(new THREE.Vector3(99, 99, 0));
   const mouseTarget = useRef(new THREE.Vector3(99, 99, 0));
@@ -194,7 +250,7 @@ function Particles({ progressRef }: { progressRef: React.MutableRefObject<number
     mat.uniforms.uIntro.value = intro.current.v;
 
     // 滚动进度 → 段落 + 段内 mix
-    const p = THREE.MathUtils.clamp(progressRef.current, 0, heroSlides.length - 1.001);
+    const p = THREE.MathUtils.clamp(progressRef.current, 0, photos.length - 1.001);
     const seg = Math.floor(p);
     if (seg !== segmentRef.current) {
       segmentRef.current = seg;
@@ -227,7 +283,7 @@ function Particles({ progressRef }: { progressRef: React.MutableRefObject<number
   );
 }
 
-export default function ParticleHero() {
+export default function ParticleHero({ slides }: { slides: HeroSlide[] }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(0);
   const [slideIdx, setSlideIdx] = useState(0);
@@ -238,25 +294,25 @@ export default function ParticleHero() {
       start: "top top",
       end: "bottom bottom",
       onUpdate: (self) => {
-        progressRef.current = self.progress * (heroSlides.length - 1);
-        setSlideIdx(Math.round(self.progress * (heroSlides.length - 1)));
+        progressRef.current = self.progress * (slides.length - 1);
+        setSlideIdx(Math.round(self.progress * (slides.length - 1)));
       },
     });
     return () => st.kill();
-  }, []);
+  }, [slides.length]);
 
-  const slide = heroSlides[slideIdx];
+  const slide = slides[slideIdx];
 
   return (
-    <div ref={wrapRef} style={{ height: `${heroSlides.length * 90}vh` }} className="relative">
+    <div ref={wrapRef} style={{ height: `${slides.length * 90}vh` }} className="relative">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         <Canvas
           camera={{ position: [0, 0, 9], fov: 50 }}
           dpr={[1, 1.8]}
           gl={{ antialias: false, powerPreference: "high-performance" }}
         >
-          <color attach="background" args={["#06070d"]} />
-          <Particles progressRef={progressRef} />
+          <color attach="background" args={["#070b09"]} />
+          <Particles slides={slides} progressRef={progressRef} />
         </Canvas>
 
         {/* HTML 叠加层 */}
@@ -266,13 +322,13 @@ export default function ParticleHero() {
               <span className="text-gradient">微光成炬</span>
             </h1>
             <p className="mt-4 text-base text-slate-400 md:text-lg">
-              公司义工团影像档案 · 每一粒光都是一次善行
+              Reshine 义工团影像档案 · 每一粒光都是一次善行
             </p>
           </div>
           <div className="glass rounded-2xl px-6 py-3 text-center">
             <p className="text-sm font-semibold text-white">{slide.title}</p>
             <p className="mt-0.5 text-xs text-slate-400">
-              {slide.date} · 滚动穿越 {heroSlides.length} 次活动
+              {slide.date} · 滚动穿越 {slides.length} 次活动
             </p>
           </div>
         </div>

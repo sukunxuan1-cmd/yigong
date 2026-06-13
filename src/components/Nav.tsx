@@ -15,9 +15,19 @@ export default function Nav() {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
       <div className="glass mx-auto mt-4 flex w-[min(92%,64rem)] items-center justify-between rounded-2xl px-5 py-3">
-        <Link href="/" className="font-display text-lg font-bold tracking-wide">
-          <span className="text-gradient">微光</span>
-          <span className="ml-1 text-slate-300">义工团</span>
+        <Link href="/" className="flex items-center gap-2.5 font-display text-lg font-bold tracking-wide">
+          {/* 把公司 LOGO 放到 public/logo.png 即自动显示 */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt=""
+            className="h-8 w-auto"
+            onError={(e) => (e.currentTarget.style.display = "none")}
+          />
+          <span>
+            <span className="text-gradient">Reshine</span>
+            <span className="ml-1.5 text-slate-300">义工团</span>
+          </span>
         </Link>
         <nav className="flex items-center gap-1 text-sm">
           {links.map((l) => {

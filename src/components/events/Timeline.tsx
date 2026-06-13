@@ -4,14 +4,14 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { events } from "@/lib/data";
+import type { VolunteerEvent } from "@/lib/data";
 import PhotoImg from "@/components/PhotoImg";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-export default function Timeline() {
+export default function Timeline({ events }: { events: VolunteerEvent[] }) {
   const root = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
 
@@ -79,7 +79,7 @@ export default function Timeline() {
         <div className="absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-white/8 md:block">
           <div
             ref={lineRef}
-            className="h-full w-full origin-top bg-gradient-to-b from-neon via-aqua to-rose"
+            className="h-full w-full origin-top bg-gradient-to-b from-leaf via-mint to-gold"
           />
         </div>
 
@@ -95,7 +95,7 @@ export default function Timeline() {
               >
                 {/* 节点 */}
                 <div
-                  className={`absolute top-2 hidden h-4 w-4 rounded-full bg-gradient-to-br from-neon to-aqua shadow-[0_0_18px_rgba(124,108,255,0.9)] md:block ${
+                  className={`absolute top-2 hidden h-4 w-4 rounded-full bg-gradient-to-br from-leaf to-mint shadow-[0_0_18px_rgba(31,164,92,0.9)] md:block ${
                     left ? "-right-[calc(8.7%+8px)]" : "-left-[calc(8.7%+8px)]"
                   }`}
                 />
@@ -104,6 +104,7 @@ export default function Timeline() {
                     <div className="tl-photo relative aspect-[16/9] scale-110 overflow-hidden">
                       <PhotoImg
                         seed={e.cover}
+                        src={e.coverSrc}
                         alt={e.title}
                         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
@@ -111,7 +112,7 @@ export default function Timeline() {
                     </div>
                   </div>
                   <div className="mt-5">
-                    <p className="text-xs font-semibold tracking-widest text-aqua">
+                    <p className="text-xs font-semibold tracking-widest text-mint">
                       {e.date} · {e.location}
                     </p>
                     <h2 className="mt-2 font-display text-2xl font-bold text-white transition-colors group-hover:text-gradient">
@@ -128,7 +129,7 @@ export default function Timeline() {
                         {e.participants} 人参与 · {e.photos.length} 张照片
                       </span>
                     </div>
-                    <p className="mt-4 inline-block text-sm font-semibold text-neon group-hover:underline">
+                    <p className="mt-4 inline-block text-sm font-semibold text-leaf group-hover:underline">
                       进入活动现场，发弹幕 →
                     </p>
                   </div>

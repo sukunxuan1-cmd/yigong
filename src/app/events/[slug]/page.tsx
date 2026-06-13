@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { events, getEvent } from "@/lib/data";
+import { events } from "@/lib/data";
+import { getEventBySlug } from "@/lib/serverPhotos";
 import EventDetailClient from "@/components/event/EventDetailClient";
 
 export function generateStaticParams() {
@@ -13,8 +14,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const event = getEvent(slug);
-  return { title: event ? `${event.title} · 微光义工团` : "活动详情" };
+  const event = getEventBySlug(slug);
+  return { title: event ? `${event.title} · Reshine 义工团` : "活动详情" };
 }
 
 export default async function EventDetailPage({
@@ -23,7 +24,7 @@ export default async function EventDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const event = getEvent(slug);
+  const event = getEventBySlug(slug);
   if (!event) notFound();
   return <EventDetailClient event={event} />;
 }

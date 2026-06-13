@@ -62,7 +62,7 @@ export default function Comments({ photoId }: { photoId: string }) {
       className={depth ? "ml-10 border-l border-white/8 pl-4" : ""}
     >
       <div className="flex items-start gap-3 py-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neon/70 to-aqua/70 text-sm font-bold text-white">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-leaf/70 to-mint/70 text-sm font-bold text-white">
           {c.author.slice(0, 1)}
         </div>
         <div className="min-w-0 flex-1">
@@ -77,7 +77,7 @@ export default function Comments({ photoId }: { photoId: string }) {
                 setReplyTo(c);
                 inputRef.current?.focus();
               }}
-              className="mt-1 text-xs text-slate-500 transition-colors hover:text-aqua"
+              className="mt-1 text-xs text-slate-500 transition-colors hover:text-mint"
             >
               回复
             </button>
@@ -107,7 +107,7 @@ export default function Comments({ photoId }: { photoId: string }) {
             >
               <div className="mb-2 flex items-center justify-between rounded-xl bg-white/5 px-3 py-2 text-xs text-slate-400">
                 <span className="truncate">
-                  回复 <span className="text-aqua">@{replyTo.author}</span>：{replyTo.text}
+                  回复 <span className="text-mint">@{replyTo.author}</span>：{replyTo.text}
                 </span>
                 <button onClick={() => setReplyTo(null)} className="ml-3 shrink-0 hover:text-white">
                   取消 ✕
@@ -122,7 +122,7 @@ export default function Comments({ photoId }: { photoId: string }) {
             onChange={(e) => setAuthor(e.target.value)}
             placeholder="你的名字"
             maxLength={16}
-            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-neon/60 focus:outline-none sm:w-36"
+            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-leaf/60 focus:outline-none sm:w-36"
           />
           <textarea
             ref={inputRef}
@@ -137,12 +137,12 @@ export default function Comments({ photoId }: { photoId: string }) {
             rows={1}
             maxLength={500}
             placeholder="写下你的感受…（Enter 发送）"
-            className="min-w-0 flex-1 resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-neon/60 focus:outline-none"
+            className="min-w-0 flex-1 resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-leaf/60 focus:outline-none"
           />
           <button
             onClick={submit}
             disabled={!text.trim()}
-            className="rounded-xl bg-gradient-to-r from-neon to-aqua px-5 py-2 text-sm font-bold text-ink disabled:opacity-40"
+            className="rounded-xl bg-gradient-to-r from-leaf to-mint px-5 py-2 text-sm font-bold text-ink disabled:opacity-40"
           >
             发布
           </button>

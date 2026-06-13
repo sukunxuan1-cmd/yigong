@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import HomeSections from "@/components/home/HomeSections";
+import type { VolunteerEvent } from "@/lib/data";
 
 const ParticleHero = dynamic(() => import("@/components/home/ParticleHero"), {
   ssr: false,
@@ -12,11 +13,17 @@ const ParticleHero = dynamic(() => import("@/components/home/ParticleHero"), {
   ),
 });
 
-export default function HomeClient() {
+export default function HomeClient({ events }: { events: VolunteerEvent[] }) {
+  const slides = events.map((e) => ({
+    seed: e.cover,
+    src: e.coverSrc,
+    title: e.title,
+    date: e.date,
+  }));
   return (
     <>
-      <ParticleHero />
-      <HomeSections />
+      <ParticleHero slides={slides} />
+      <HomeSections events={events} />
     </>
   );
 }

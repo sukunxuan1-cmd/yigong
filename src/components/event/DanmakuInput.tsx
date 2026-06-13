@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { getStore } from "@/lib/store";
 
-const COLORS = ["#ffffff", "#43e8d8", "#ffc861", "#ff5e8a", "#7cf29c", "#7c6cff"];
+const COLORS = ["#ffffff", "#7edca4", "#1fa45c", "#e6b85c", "#ffb3c7", "#9ad7ff"];
 
 export default function DanmakuInput({
   photoId,
@@ -55,7 +55,7 @@ export default function DanmakuInput({
       <button
         onClick={send}
         disabled={!text.trim() || sending}
-        className="rounded-xl bg-gradient-to-r from-neon to-aqua px-5 py-2 text-sm font-bold text-ink transition-opacity disabled:opacity-40"
+        className="rounded-xl bg-gradient-to-r from-leaf to-mint px-5 py-2 text-sm font-bold text-ink transition-opacity disabled:opacity-40"
       >
         发射 ➤
       </button>

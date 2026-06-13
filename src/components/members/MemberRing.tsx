@@ -171,7 +171,7 @@ function Ring({ onPick, focusAngle }: { onPick: (m: Member, a: number) => void; 
         <Float speed={2} floatIntensity={1.2}>
           <mesh>
             <icosahedronGeometry args={[0.55, 1]} />
-            <meshStandardMaterial color="#7c6cff" emissive="#7c6cff" emissiveIntensity={2} wireframe />
+            <meshStandardMaterial color="#1fa45c" emissive="#1fa45c" emissiveIntensity={2} wireframe />
           </mesh>
         </Float>
       </group>
@@ -185,10 +185,10 @@ export default function MemberRing() {
   return (
     <div className="relative h-[calc(100vh-0px)] w-full">
       <Canvas camera={{ position: [0, 0.6, 10.5], fov: 50 }} dpr={[1, 2]}>
-        <color attach="background" args={["#06070d"]} />
-        <fog attach="fog" args={["#06070d", 9, 20]} />
+        <color attach="background" args={["#070b09"]} />
+        <fog attach="fog" args={["#070b09", 9, 20]} />
         <ambientLight intensity={0.6} />
-        <pointLight position={[0, 4, 6]} intensity={30} color="#43e8d8" />
+        <pointLight position={[0, 4, 6]} intensity={30} color="#7edca4" />
         <Stars radius={60} depth={40} count={2500} factor={4} saturation={0.6} fade speed={0.6} />
         <Ring onPick={(member, angle) => setActive({ member, angle })} focusAngle={active?.angle ?? null} />
       </Canvas>
@@ -228,7 +228,7 @@ export default function MemberRing() {
                 {active.member.name.slice(0, 1)}
               </div>
               <h2 className="mt-5 font-display text-3xl font-bold text-white">{active.member.name}</h2>
-              <p className="mt-1 text-sm text-aqua">
+              <p className="mt-1 text-sm text-mint">
                 {active.member.role} · {active.member.department}
               </p>
               <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
@@ -243,7 +243,7 @@ export default function MemberRing() {
               </div>
               <p className="mt-5 text-sm italic text-slate-300">“{active.member.motto}”</p>
               <button
-                className="mt-6 rounded-2xl border border-white/15 px-6 py-2 text-sm text-slate-300 transition-colors hover:border-neon/60 hover:text-white"
+                className="mt-6 rounded-2xl border border-white/15 px-6 py-2 text-sm text-slate-300 transition-colors hover:border-leaf/60 hover:text-white"
                 onClick={() => setActive(null)}
               >
                 返回星环

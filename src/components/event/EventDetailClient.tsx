@@ -29,7 +29,7 @@ export default function EventDetailClient({ event }: { event: VolunteerEvent }) 
     <div className="mx-auto w-[min(94%,68rem)] pb-24 pt-32">
       {/* 头部 */}
       <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-        <Link href="/events" className="text-sm text-slate-400 transition-colors hover:text-aqua">
+        <Link href="/events" className="text-sm text-slate-400 transition-colors hover:text-mint">
           ← 返回时间轴
         </Link>
         <h1 className="mt-3 font-display text-3xl font-black md:text-5xl">
@@ -54,14 +54,14 @@ export default function EventDetailClient({ event }: { event: VolunteerEvent }) 
         {/* 左右切换 */}
         <button
           onClick={() => go(-1)}
-          className="group absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-ink/50 p-3 backdrop-blur transition-colors hover:bg-neon/40"
+          className="group absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-ink/50 p-3 backdrop-blur transition-colors hover:bg-leaf/40"
           aria-label="上一张"
         >
           <span className="block text-white">‹</span>
         </button>
         <button
           onClick={() => go(1)}
-          className="group absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-ink/50 p-3 backdrop-blur transition-colors hover:bg-neon/40"
+          className="group absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-ink/50 p-3 backdrop-blur transition-colors hover:bg-leaf/40"
           aria-label="下一张"
         >
           <span className="block text-white">›</span>
@@ -79,7 +79,7 @@ export default function EventDetailClient({ event }: { event: VolunteerEvent }) 
             <button
               onClick={() => setDanmakuOn((v) => !v)}
               className={`rounded-full px-4 py-2.5 text-xs font-semibold backdrop-blur transition-colors ${
-                danmakuOn ? "bg-aqua/20 text-aqua" : "bg-white/10 text-slate-400"
+                danmakuOn ? "bg-mint/20 text-mint" : "bg-white/10 text-slate-400"
               }`}
             >
               弹幕 {danmakuOn ? "开" : "关"}
@@ -102,7 +102,7 @@ export default function EventDetailClient({ event }: { event: VolunteerEvent }) 
             onClick={() => setIndex(i)}
             className={`relative aspect-[3/2] w-28 shrink-0 overflow-hidden rounded-xl border transition-all ${
               i === index
-                ? "border-neon shadow-[0_0_16px_rgba(124,108,255,0.5)]"
+                ? "border-leaf shadow-[0_0_16px_rgba(31,164,92,0.5)]"
                 : "border-white/10 opacity-60 hover:opacity-100"
             }`}
             aria-label={p.caption}
