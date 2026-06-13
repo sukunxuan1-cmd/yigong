@@ -3,7 +3,12 @@ import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+import { asset } from "@/lib/asset";
+
+// 站点根地址：优先显式配置，其次 Vercel 自动注入的域名，最后本地
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -12,6 +17,7 @@ export const metadata: Metadata = {
     template: "%s",
   },
   description: "记录每一次出发——Reshine 义工团的成员、活动与影像档案。",
+  icons: { icon: asset("/logo.png"), apple: asset("/logo.png") },
   openGraph: {
     title: "Reshine 义工团 · 义工活动记录",
     description: "记录每一次出发——Reshine 义工团的成员、活动与影像档案。",

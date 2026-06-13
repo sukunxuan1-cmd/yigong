@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { members, type Member, type VolunteerEvent } from "@/lib/data";
 import PhotoImg from "@/components/PhotoImg";
 import ShareBar from "@/components/ShareBar";
+import { asset } from "@/lib/asset";
 
 function initial(name: string) {
   return name.slice(0, 1);
@@ -47,7 +48,7 @@ export default function MemberDetail({
           >
             {member.photo ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={member.photo} alt={member.name} className="h-full w-full object-cover" />
+              <img src={asset(member.photo)} alt={member.name} className="h-full w-full object-cover" />
             ) : (
               initial(member.name)
             )}
@@ -168,7 +169,7 @@ function Avatar({ m }: { m: Member }) {
     >
       {m.photo ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={m.photo} alt={m.name} className="h-full w-full object-cover" />
+        <img src={asset(m.photo)} alt={m.name} className="h-full w-full object-cover" />
       ) : (
         m.name.slice(0, 1)
       )}

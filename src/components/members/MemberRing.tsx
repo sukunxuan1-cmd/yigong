@@ -9,6 +9,7 @@ import gsap from "gsap";
 import { AnimatePresence, motion } from "framer-motion";
 import { members, type Member } from "@/lib/data";
 import { avatarCanvas } from "@/lib/placeholder";
+import { asset } from "@/lib/asset";
 
 const RADIUS = 5.2;
 const TWO_PI = Math.PI * 2;
@@ -123,7 +124,7 @@ function Card({
       drawCard(member, img, canvas);
       texture.needsUpdate = true;
     };
-    img.src = member.photo;
+    img.src = asset(member.photo);
   }, [member, canvas, texture]);
 
   useFrame(() => {
@@ -265,7 +266,7 @@ export default function MemberRing() {
               >
                 {active.member.photo ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={active.member.photo} alt={active.member.name} className="h-full w-full object-cover" />
+                  <img src={asset(active.member.photo)} alt={active.member.name} className="h-full w-full object-cover" />
                 ) : (
                   active.member.name.slice(0, 1)
                 )}

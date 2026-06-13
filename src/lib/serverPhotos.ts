@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { events as baseEvents, type Photo, type VolunteerEvent } from "./data";
+import { asset } from "./asset";
 
 const EXTS = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif"]);
 
@@ -32,7 +33,7 @@ export function getEvents(): VolunteerEvent[] {
         id: `${e.slug}/${f}`,
         seed: e.cover + i,
         caption,
-        src: `/photos/${encodeURIComponent(e.slug)}/${encodeURIComponent(f)}`,
+        src: asset(`/photos/${encodeURIComponent(e.slug)}/${encodeURIComponent(f)}`),
       };
     });
     return { ...e, photos, coverSrc: photos[0].src };

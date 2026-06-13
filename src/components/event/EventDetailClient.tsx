@@ -11,6 +11,7 @@ import LikeButton from "@/components/event/LikeButton";
 import Comments from "@/components/event/Comments";
 import PhotoImg from "@/components/PhotoImg";
 import ShareBar from "@/components/ShareBar";
+import { asset } from "@/lib/asset";
 
 const PhotoStage = dynamic(() => import("@/components/event/PhotoStage"), {
   ssr: false,
@@ -64,7 +65,7 @@ export default function EventDetailClient({
                   >
                     {m.photo ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={m.photo} alt={m.name} className="h-full w-full object-cover" />
+                      <img src={asset(m.photo)} alt={m.name} className="h-full w-full object-cover" />
                     ) : (
                       m.name.slice(0, 1)
                     )}
