@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Float, Stars } from "@react-three/drei";
 import * as THREE from "three";
@@ -285,12 +286,23 @@ export default function MemberRing() {
                 </div>
               </div>
               <p className="mt-5 text-sm italic text-slate-300">“{active.member.motto}”</p>
-              <button
-                className="mt-6 rounded-2xl border border-white/15 px-6 py-2 text-sm text-slate-300 transition-colors hover:border-leaf/60 hover:text-white"
-                onClick={() => setActive(null)}
-              >
-                返回星环
-              </button>
+              <p className="mt-4 line-clamp-3 text-left text-sm leading-relaxed text-slate-400">
+                {active.member.bio}
+              </p>
+              <div className="mt-6 flex items-center justify-center gap-3">
+                <Link
+                  href={`/members/${active.member.id}`}
+                  className="rounded-2xl bg-gradient-to-r from-leaf to-mint px-6 py-2 text-sm font-bold text-ink transition-transform hover:scale-105"
+                >
+                  查看完整简介 →
+                </Link>
+                <button
+                  className="rounded-2xl border border-white/15 px-5 py-2 text-sm text-slate-300 transition-colors hover:border-leaf/60 hover:text-white"
+                  onClick={() => setActive(null)}
+                >
+                  返回星环
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
