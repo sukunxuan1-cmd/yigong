@@ -150,7 +150,7 @@ export default function LikeButton({ photoId }: { photoId: string }) {
       <motion.button
         animate={controls}
         onClick={handleLike}
-        className="glass glow-ring relative flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white"
+        className="glass glow-ring relative flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-cocoa"
         aria-label="点赞"
       >
         <span className="text-rose">❤</span>

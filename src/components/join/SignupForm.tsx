@@ -60,26 +60,26 @@ export default function SignupForm({
   };
 
   const field =
-    "w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-leaf/60 focus:outline-none";
+    "w-full rounded-xl border border-cocoa/10 bg-cocoa/5 px-3 py-2.5 text-sm text-cocoa placeholder:text-mocha/70 focus:border-leaf/60 focus:outline-none";
 
   return (
     <div className="glass glow-ring rounded-3xl p-6">
       {/* 名额进度 */}
       <div className="mb-4">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-slate-300">报名进度</span>
+          <span className="text-cocoa/80">报名进度</span>
           <span className="text-mint">
             {count === null ? "…" : `${count} / ${slots} 人`}
           </span>
         </div>
-        <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-cocoa/10">
           <div
             className="h-full rounded-full bg-gradient-to-r from-leaf to-mint transition-all duration-500"
             style={{ width: `${count === null ? 0 : Math.min(100, (count / slots) * 100)}%` }}
           />
         </div>
         {remaining !== null && (
-          <p className="mt-1.5 text-xs text-slate-500">
+          <p className="mt-1.5 text-xs text-mocha/70">
             {full ? "名额已满，可留言候补～" : `还剩 ${remaining} 个名额`}
           </p>
         )}
@@ -94,8 +94,8 @@ export default function SignupForm({
             className="rounded-2xl bg-leaf/15 p-6 text-center"
           >
             <p className="text-3xl">🎉</p>
-            <p className="mt-2 font-semibold text-white">报名成功！</p>
-            <p className="mt-1 text-sm text-slate-300">我们会通过你留下的联系方式通知集合详情，感谢加入！</p>
+            <p className="mt-2 font-semibold text-cocoa">报名成功！</p>
+            <p className="mt-1 text-sm text-cocoa/80">我们会通过你留下的联系方式通知集合详情，感谢加入！</p>
             <button
               onClick={() => setDone(false)}
               className="mt-4 text-xs text-mint hover:underline"
@@ -118,7 +118,7 @@ export default function SignupForm({
             >
               {full ? "名额已满" : sending ? "提交中…" : "我要报名 →"}
             </button>
-            <p className="text-center text-xs text-slate-500">信息仅用于本次活动联络，不对外公开</p>
+            <p className="text-center text-xs text-mocha/70">信息仅用于本次活动联络，不对外公开</p>
           </motion.div>
         )}
       </AnimatePresence>

@@ -64,7 +64,7 @@ export default function ShareBar({
   };
 
   const btn =
-    "flex items-center gap-1.5 rounded-full border border-white/12 bg-white/5 px-4 py-2 text-xs font-semibold text-slate-200 transition-colors hover:border-leaf/50 hover:text-white";
+    "flex items-center gap-1.5 rounded-full border border-cocoa/12 bg-cocoa/5 px-4 py-2 text-xs font-semibold text-cocoa/80 transition-colors hover:border-leaf/50 hover:text-cocoa";
 
   return (
     <div ref={wrapRef} className="relative flex flex-wrap items-center gap-2">
@@ -92,9 +92,9 @@ export default function ShareBar({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={qr} alt="二维码" className="h-40 w-40 rounded-lg" />
             ) : (
-              <div className="flex h-40 w-40 items-center justify-center text-xs text-slate-500">生成中…</div>
+              <div className="flex h-40 w-40 items-center justify-center text-xs text-mocha/70">生成中…</div>
             )}
-            <p className="mt-2 text-xs text-slate-400">微信扫码 · 分享给同事</p>
+            <p className="mt-2 text-xs text-mocha">微信扫码 · 分享给同事</p>
           </motion.div>
         )}
       </AnimatePresence>

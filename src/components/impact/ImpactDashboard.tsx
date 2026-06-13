@@ -49,7 +49,7 @@ export default function ImpactDashboard({ stats }: { stats: Stats }) {
         <h1 className="font-display text-4xl font-black md:text-5xl">
           我们的<span className="text-gradient">公益足迹</span>
         </h1>
-        <p className="mt-3 text-sm text-slate-400">每一个数字背后，都是一次真实的出发与陪伴</p>
+        <p className="mt-3 text-sm text-mocha">每一个数字背后，都是一次真实的出发与陪伴</p>
       </div>
 
       {/* 关键数字 */}
@@ -65,7 +65,7 @@ export default function ImpactDashboard({ stats }: { stats: Stats }) {
             <p className="font-display text-3xl font-black text-gradient md:text-4xl">
               <CountUp value={s.value} suffix={s.suffix} />
             </p>
-            <p className="mt-2 text-sm text-slate-400">{s.label}</p>
+            <p className="mt-2 text-sm text-mocha">{s.label}</p>
           </motion.div>
         ))}
       </div>
@@ -73,17 +73,17 @@ export default function ImpactDashboard({ stats }: { stats: Stats }) {
       <div className="mt-10 grid gap-6 md:grid-cols-2">
         {/* 逐年志愿时长 */}
         <div className="glass rounded-3xl p-6">
-          <h2 className="font-display text-lg font-bold text-white">逐年志愿时长</h2>
+          <h2 className="font-display text-lg font-bold text-cocoa">逐年志愿时长</h2>
           <div className="mt-6 space-y-4">
             {stats.byYear.map((y) => (
               <div key={y.year}>
                 <div className="mb-1 flex justify-between text-sm">
-                  <span className="text-slate-300">{y.year} 年</span>
-                  <span className="text-slate-400">
+                  <span className="text-cocoa/80">{y.year} 年</span>
+                  <span className="text-mocha">
                     {y.hours.toLocaleString()} 小时 · {y.events} 场
                   </span>
                 </div>
-                <div className="h-3 overflow-hidden rounded-full bg-white/8">
+                <div className="h-3 overflow-hidden rounded-full bg-cocoa/8">
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: `${(y.hours / maxHours) * 100}%` }}
@@ -99,15 +99,15 @@ export default function ImpactDashboard({ stats }: { stats: Stats }) {
 
         {/* 活动分类 */}
         <div className="glass rounded-3xl p-6">
-          <h2 className="font-display text-lg font-bold text-white">公益领域分布</h2>
+          <h2 className="font-display text-lg font-bold text-cocoa">公益领域分布</h2>
           <div className="mt-6 space-y-4">
             {stats.byTag.map((t) => (
               <div key={t.tag}>
                 <div className="mb-1 flex justify-between text-sm">
-                  <span className="text-slate-300">{t.tag}</span>
-                  <span className="text-slate-400">{t.count} 场</span>
+                  <span className="text-cocoa/80">{t.tag}</span>
+                  <span className="text-mocha">{t.count} 场</span>
                 </div>
-                <div className="h-3 overflow-hidden rounded-full bg-white/8">
+                <div className="h-3 overflow-hidden rounded-full bg-cocoa/8">
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: `${(t.count / maxTag) * 100}%` }}
@@ -125,7 +125,7 @@ export default function ImpactDashboard({ stats }: { stats: Stats }) {
       <div className="mt-12 flex flex-wrap justify-center gap-4">
         <Link
           href="/events"
-          className="glass glow-ring rounded-2xl px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-105"
+          className="glass glow-ring rounded-2xl px-6 py-3 text-sm font-semibold text-cocoa transition-transform hover:scale-105"
         >
           浏览活动档案 →
         </Link>

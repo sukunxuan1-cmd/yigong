@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html {
@@ -11,45 +11,54 @@ html {
 }
 
 body {
-  @apply bg-ink text-slate-200 antialiased;
+  @apply bg-cream text-cocoa antialiased;
   overflow-x: hidden;
+  /* 柔和的暖色光晕背景，营造温暖氛围 */
+  background-color: #fff7ec;
+  background-image:
+    radial-gradient(42rem 42rem at 12% -8%, rgba(255, 159, 126, 0.22), transparent 60%),
+    radial-gradient(38rem 38rem at 92% 4%, rgba(134, 220, 174, 0.22), transparent 60%),
+    radial-gradient(40rem 40rem at 70% 100%, rgba(255, 195, 91, 0.18), transparent 60%);
+  background-attachment: fixed;
 }
 
 ::selection {
-  background: rgba(31, 164, 92, 0.55);
-  color: #fff;
+  background: rgba(255, 159, 126, 0.45);
+  color: #4a382e;
 }
 
 ::-webkit-scrollbar {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #070b09;
+  background: #fbeede;
 }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(#1fa45c, #7edca4);
+  background: linear-gradient(#3bb273, #ff9f7e);
   border-radius: 8px;
 }
 
 .text-gradient {
-  background: linear-gradient(110deg, #2db368 15%, #7edca4 60%, #c8eed8 95%);
+  background: linear-gradient(100deg, #2f9e63 5%, #ff9f7e 95%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
+/* 柔和的奶油玻璃卡片 */
 .glass {
-  background: rgba(10, 18, 14, 0.55);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  border: 1px solid rgba(74, 56, 46, 0.08);
 }
 
+/* 温暖的柔光描边/投影 */
 .glow-ring {
   box-shadow:
-    0 0 0 1px rgba(31, 164, 92, 0.28),
-    0 0 40px rgba(31, 164, 92, 0.16),
-    inset 0 0 24px rgba(126, 220, 164, 0.05);
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 18px 40px -20px rgba(255, 159, 126, 0.45),
+    0 8px 24px -16px rgba(59, 178, 115, 0.3);
 }
 
 @keyframes float-y {

@@ -15,7 +15,7 @@ export default function JoinPage() {
         <h1 className="font-display text-4xl font-black md:text-5xl">
           加入<span className="text-gradient">下一次出发</span>
         </h1>
-        <p className="mt-3 text-sm text-slate-400">
+        <p className="mt-3 text-sm text-mocha">
           下面是即将开展的活动，选一个，填好信息就报名成功——名额有限，先到先得
         </p>
       </div>
@@ -28,7 +28,7 @@ export default function JoinPage() {
           >
             {/* 活动信息 + 封面 */}
             <div>
-              <div className="relative aspect-[16/10] overflow-hidden rounded-3xl border border-white/10">
+              <div className="relative aspect-[16/10] overflow-hidden rounded-3xl border border-cocoa/10">
                 <PhotoImg seed={e.cover} alt={e.title} className="h-full w-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/85 to-transparent" />
                 <div className="absolute bottom-4 left-5 right-5">
@@ -40,12 +40,12 @@ export default function JoinPage() {
                     ))}
                   </div>
                   <h2 className="mt-2 font-display text-2xl font-bold text-white">{e.title}</h2>
-                  <p className="mt-1 text-sm text-slate-300">
+                  <p className="mt-1 text-sm text-white/85">
                     {e.date} · {e.location}
                   </p>
                 </div>
               </div>
-              <p className="mt-4 leading-relaxed text-slate-300">{e.summary}</p>
+              <p className="mt-4 leading-relaxed text-cocoa/80">{e.summary}</p>
             </div>
 
             {/* 报名表单 */}

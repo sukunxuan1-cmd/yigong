@@ -27,12 +27,12 @@ const smooth = (a: number, b: number, x: number) => {
 };
 
 // 复用的颜色常量（避免每帧 new）
-const C_FOG_A = new THREE.Color("#0a0f0c");
-const C_FOG_B = new THREE.Color("#1a1208");
-const C_BG_A = new THREE.Color("#04060a");
-const C_BG_B = new THREE.Color("#0c0a07");
-const C_AMB_A = new THREE.Color("#9fb4ff");
-const C_AMB_B = new THREE.Color("#ffd9b0");
+const C_FOG_A = new THREE.Color("#fff1e0");
+const C_FOG_B = new THREE.Color("#ffe6cf");
+const C_BG_A = new THREE.Color("#fff7ec");
+const C_BG_B = new THREE.Color("#ffeede");
+const C_AMB_A = new THREE.Color("#fff4e6");
+const C_AMB_B = new THREE.Color("#ffe7c8");
 
 /* ---------------------------- 纹理工具 ---------------------------- */
 
@@ -84,11 +84,11 @@ function makeLabelTexture(year: string, title: string) {
   c.height = h;
   const ctx = c.getContext("2d")!;
   ctx.textBaseline = "middle";
-  ctx.fillStyle = "#7edca4";
+  ctx.fillStyle = "#3bb273";
   ctx.font = "bold 64px system-ui, sans-serif";
   ctx.fillText(year, 8, h / 2);
   const yw = ctx.measureText(year).width;
-  ctx.fillStyle = "rgba(255,255,255,0.92)";
+  ctx.fillStyle = "rgba(74,56,46,0.92)";
   ctx.font = "44px system-ui, sans-serif";
   ctx.fillText(title, 8 + yw + 28, h / 2 + 2);
   const tex = new THREE.CanvasTexture(c);
@@ -105,13 +105,13 @@ function makeLogoTexture() {
   const ctx = c.getContext("2d")!;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.shadowColor = "rgba(126,220,164,0.55)";
-  ctx.shadowBlur = 38;
-  ctx.fillStyle = "#ffffff";
+  ctx.shadowColor = "rgba(255,159,126,0.45)";
+  ctx.shadowBlur = 30;
+  ctx.fillStyle = "#4a382e";
   ctx.font = "bold 200px system-ui, sans-serif";
   ctx.fillText("义工团", w / 2, h * 0.42);
   ctx.shadowBlur = 0;
-  ctx.fillStyle = "rgba(126,220,164,0.85)";
+  ctx.fillStyle = "rgba(59,178,115,0.95)";
   ctx.font = "600 52px system-ui, sans-serif";
   ctx.fillText("R E S H I N E   V O L U N T E E R", w / 2, h * 0.82);
   const tex = new THREE.CanvasTexture(c);
@@ -156,10 +156,10 @@ const heroFrag = /* glsl */ `
     vec2 uv = vUv + vDisp * 0.25;
     vec3 col = texture2D(uTex, uv).rgb;
     // 水波高光
-    col += vec3(0.55, 1.0, 0.7) * max(vDisp, 0.0) * 1.1 * (0.4 + uActive);
+    col += vec3(1.0, 0.85, 0.6) * max(vDisp, 0.0) * 1.0 * (0.4 + uActive);
     // 暗角
-    float vig = smoothstep(1.05, 0.45, distance(vUv, vec2(0.5)));
-    col *= 0.55 + 0.45 * vig;
+    float vig = smoothstep(1.1, 0.5, distance(vUv, vec2(0.5)));
+    col *= 0.88 + 0.12 * vig;
     gl_FragColor = vec4(col, uOpacity);
   }
 `;
@@ -329,7 +329,7 @@ function Scene({
 
     /* —— 灯光 / 雾 —— */
     if (ambientRef.current) {
-      ambientRef.current.intensity = 0.05 + smooth(0.04, 0.22, p) * 0.5;
+      ambientRef.current.intensity = 0.55 + smooth(0.04, 0.22, p) * 0.5;
       ambientRef.current.color.lerpColors(C_AMB_A, C_AMB_B, smooth(0.25, 0.7, p));
     }
     if (spotRef.current) {
@@ -416,8 +416,8 @@ function Scene({
 
   return (
     <>
-      <color ref={bgRef} attach="background" args={["#04060a"]} />
-      <fogExp2 ref={fogRef} attach="fog" args={["#0a0f0c", 0]} />
+      <color ref={bgRef} attach="background" args={["#fff7ec"]} />
+      <fogExp2 ref={fogRef} attach="fog" args={["#fff1e0", 0]} />
       <ambientLight ref={ambientRef} intensity={0.05} />
       <spotLight
         ref={spotRef}
@@ -479,7 +479,7 @@ function Scene({
       {/* 第三幕 桌面 + 卡片堆（桌面尺寸收小，且仅第三幕淡入） */}
       <mesh ref={tableMeshRef} position={[0, -0.35, -33]} rotation={[-Math.PI / 2, 0, 0]} visible={false}>
         <planeGeometry args={[16, 12]} />
-        <meshStandardMaterial color="#0d1310" roughness={1} transparent opacity={0} />
+        <meshStandardMaterial color="#ecd6bb" roughness={1} transparent opacity={0} />
       </mesh>
       {stack.map((s, i) => (
         <group
@@ -516,7 +516,7 @@ export default function HeroJourney({ events }: { events: VolunteerEvent[] }) {
           <Scroll html style={{ width: "100%" }}>
             {/* 叙事在 offset≈0.78（≈390vh）结束，板块在 405vh 升起，仅在转暗的第三幕末尾露出 */}
             <div style={{ position: "absolute", top: "405vh", width: "100vw" }}>
-              <div className="bg-gradient-to-b from-transparent via-ink/90 to-ink pt-28">
+              <div className="bg-gradient-to-b from-transparent via-cream/85 to-cream pt-28">
                 <HomeSections events={events} embedded />
               </div>
             </div>
@@ -530,16 +530,18 @@ export default function HeroJourney({ events }: { events: VolunteerEvent[] }) {
         className="pointer-events-none fixed inset-0 z-30 flex flex-col items-center justify-center px-6 text-center"
         style={{ opacity: 0, visibility: "hidden" }}
       >
-        <p className="mb-4 text-sm tracking-[0.5em] text-mint/80">RESHINE 义工团</p>
-        <h1 className="font-display text-6xl font-black leading-[1.05] text-white drop-shadow-[0_4px_30px_rgba(0,0,0,0.7)] md:text-8xl">
-          记录每一次
-          <br />
-          <span className="text-gradient">微光与善行</span>
-        </h1>
-        <p className="mt-6 max-w-md text-base text-slate-300/90">滚动，跟随镜头穿过我们走过的每一站</p>
+        <div className="rounded-[2.5rem] bg-cream/55 px-10 py-8 backdrop-blur-md">
+          <p className="mb-4 text-sm font-semibold tracking-[0.5em] text-leaf">RESHINE 义工团</p>
+          <h1 className="font-display text-6xl font-black leading-[1.05] text-cocoa drop-shadow-[0_2px_16px_rgba(255,247,236,0.9)] md:text-8xl">
+            记录每一次
+            <br />
+            <span className="text-gradient">微光与善行</span>
+          </h1>
+          <p className="mt-6 text-base text-mocha">滚动，跟随镜头穿过我们走过的每一站 🌿</p>
+        </div>
       </div>
 
-      <div className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-[0.3em] text-slate-500">
+      <div className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-[0.3em] text-mocha/70">
         SCROLL ↓
       </div>
     </div>

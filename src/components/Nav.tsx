@@ -28,7 +28,7 @@ export default function Nav() {
           />
           <span>
             <span className="text-gradient">Reshine</span>
-            <span className="ml-1.5 text-slate-300">义工团</span>
+            <span className="ml-1.5 text-cocoa/80">义工团</span>
           </span>
         </Link>
         <nav className="flex items-center gap-0.5 text-sm">
@@ -39,13 +39,13 @@ export default function Nav() {
                 key={l.href}
                 href={l.href}
                 className={`relative rounded-xl px-3 py-2 transition-colors ${
-                  active ? "text-white" : "text-slate-400 hover:text-slate-200"
+                  active ? "text-cocoa" : "text-mocha hover:text-cocoa"
                 }`}
               >
                 {active && (
                   <motion.span
                     layoutId="nav-pill"
-                    className="absolute inset-0 rounded-xl bg-white/10 glow-ring"
+                    className="absolute inset-0 rounded-xl bg-cocoa/10 glow-ring"
                     transition={{ type: "spring", stiffness: 350, damping: 30 }}
                   />
                 )}

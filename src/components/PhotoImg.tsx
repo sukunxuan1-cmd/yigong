@@ -24,7 +24,7 @@ export default function PhotoImg({
     if (!src) setUrl(photoURL(seed));
   }, [seed, src]);
 
-  if (!url) return <div className={`${className ?? ""} animate-pulse bg-haze`} aria-label={alt} />;
+  if (!url) return <div className={`${className ?? ""} animate-pulse bg-sand`} aria-label={alt} />;
   // eslint-disable-next-line @next/next/no-img-element
   return <img src={url} alt={alt} loading="lazy" className={className} draggable={false} />;
 }
