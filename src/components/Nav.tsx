@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
+import { asset } from "@/lib/asset";
 
 const links = [
   { href: "/", label: "首页" },
@@ -21,7 +22,7 @@ export default function Nav() {
           {/* 把公司 LOGO 放到 public/logo.png 即自动显示 */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/logo.png"
+            src={asset("/logo.png")}
             alt=""
             className="h-8 w-auto"
             onError={(e) => (e.currentTarget.style.display = "none")}

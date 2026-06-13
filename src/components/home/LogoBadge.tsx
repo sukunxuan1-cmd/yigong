@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useScroll } from "@react-three/drei";
+import { asset } from "@/lib/asset";
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const smooth = (a: number, b: number, x: number) => {
@@ -55,7 +56,7 @@ export default function LogoBadge({
 
   // 真实 logo 贴图（public/logo.png）
   const logoTex = useMemo(() => {
-    const t = new THREE.TextureLoader().load("/logo.png");
+    const t = new THREE.TextureLoader().load(asset("/logo.png"));
     t.colorSpace = THREE.SRGBColorSpace;
     t.anisotropy = 8;
     t.center.set(0.5, 0.5);
