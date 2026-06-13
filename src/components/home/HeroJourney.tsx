@@ -375,6 +375,12 @@ function Scene({
       THREE.MathUtils.lerp(a.tgt[1], b.tgt[1], lt),
       THREE.MathUtils.lerp(a.tgt[2], b.tgt[2], lt)
     );
+    // 竖屏（手机）按比例把镜头拉远，让 logo/照片完整入镜不被裁切
+    const aspect = state.size.width / Math.max(1, state.size.height);
+    if (aspect < 1) {
+      const fit = THREE.MathUtils.clamp(0.95 / aspect, 1, 2.1);
+      tmpPos.sub(tgt).multiplyScalar(fit).add(tgt);
+    }
     // 克制的鼠标视差（2~3 度）
     const par = 0.18 * smooth(0.12, 0.3, p);
     tmpPos.x += pointer.x * par;
@@ -592,9 +598,9 @@ export default function HeroJourney({ events }: { events: VolunteerEvent[] }) {
         className="pointer-events-none fixed inset-0 z-30 flex flex-col items-center justify-center px-6 text-center"
         style={{ opacity: 0, visibility: "hidden" }}
       >
-        <div className="rounded-[2.5rem] bg-cream/55 px-10 py-8 backdrop-blur-md">
-          <p className="mb-4 text-sm font-semibold tracking-[0.5em] text-leaf">RESHINE 义工团</p>
-          <h1 className="font-display text-6xl font-black leading-[1.05] text-cocoa drop-shadow-[0_2px_16px_rgba(255,247,236,0.9)] md:text-8xl">
+        <div className="rounded-[2rem] bg-cream/55 px-6 py-6 backdrop-blur-md sm:rounded-[2.5rem] sm:px-10 sm:py-8">
+          <p className="mb-3 text-xs font-semibold tracking-[0.4em] text-leaf sm:mb-4 sm:text-sm sm:tracking-[0.5em]">RESHINE 义工团</p>
+          <h1 className="font-display text-5xl font-black leading-[1.05] text-cocoa drop-shadow-[0_2px_16px_rgba(255,247,236,0.9)] sm:text-6xl md:text-8xl">
             记录每一次
             <br />
             <span className="text-gradient">微光与善行</span>
