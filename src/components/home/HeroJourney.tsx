@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { ScrollControls, Scroll, useScroll } from "@react-three/drei";
 import HomeSections from "@/components/home/HomeSections";
+import LogoBadge from "@/components/home/LogoBadge";
 import { photoCanvas } from "@/lib/placeholder";
 import type { VolunteerEvent } from "@/lib/data";
 
@@ -16,9 +17,9 @@ import type { VolunteerEvent } from "@/lib/data";
  *   第三幕 75~100% 照片堆叠：俯视桌面，卡片逐张飞出
  * ------------------------------------------------------------------ */
 
-const TOTAL_PAGES = 6;
-// 3D 叙事占滚动的前 78%，图文板块在末尾（第三幕画面转暗后）升起，避免提前露出
-const NARR_FRAC = 0.78;
+const TOTAL_PAGES = 7;
+// 3D 叙事占滚动的前 68%，留出收尾镜头展示桌面 LOGO，图文板块在其后升起
+const NARR_FRAC = 0.68;
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const smooth = (a: number, b: number, x: number) => {
@@ -442,8 +443,8 @@ function Scene({
       titleRef.current.style.transform = `translateY(${(p - 0.22) * -140}px)`;
     }
 
-    /* —— 第二幕 长廊：仅在接近/进入长廊时显示，避免开场遮挡 logo —— */
-    if (corridorGroupRef.current) corridorGroupRef.current.visible = p > 0.24;
+    /* —— 第二幕 长廊：开场与第三幕收尾都隐藏，保持干净 —— */
+    if (corridorGroupRef.current) corridorGroupRef.current.visible = p > 0.24 && p < 0.82;
 
     /* —— 第二幕 标签淡入 —— */
     const reveal = smooth(0.3, 0.42, p);
@@ -452,8 +453,8 @@ function Scene({
       (mesh.material as THREE.MeshBasicMaterial).opacity = reveal;
     });
 
-    /* —— 第三幕 卡片逐张飞出 —— */
-    const lp = smooth(0.85, 1.0, p);
+    /* —— 第三幕 卡片逐张飞出（提前飞完，给桌面 LOGO 收尾镜头） —— */
+    const lp = smooth(0.8, 0.92, p);
     const n = stack.length;
     stackRefs.current.forEach((grp, i) => {
       if (!grp) return;
@@ -540,6 +541,8 @@ function Scene({
         <planeGeometry args={[16, 12]} />
         <meshStandardMaterial color="#ecd6bb" roughness={1} transparent opacity={0} />
       </mesh>
+      {/* 桌面上的可互动 3D LOGO 徽章（卡片飞走后浮现，可悬停/点击） */}
+      <LogoBadge narrFrac={NARR_FRAC} position={[0, -0.28, -33]} />
       {stack.map((s, i) => (
         <group
           key={i}
@@ -573,8 +576,8 @@ export default function HeroJourney({ events }: { events: VolunteerEvent[] }) {
         <ScrollControls pages={TOTAL_PAGES} damping={0.28}>
           <Scene events={events} titleRef={titleRef} />
           <Scroll html style={{ width: "100%" }}>
-            {/* 叙事在 offset≈0.78（≈390vh）结束，板块在 405vh 升起，仅在转暗的第三幕末尾露出 */}
-            <div style={{ position: "absolute", top: "405vh", width: "100vw" }}>
+            {/* 叙事在 offset≈0.68（≈408vh）结束并展示桌面 LOGO，板块在 510vh 之后才升起 */}
+            <div style={{ position: "absolute", top: "510vh", width: "100vw" }}>
               <div className="bg-gradient-to-b from-transparent via-cream/85 to-cream pt-28">
                 <HomeSections events={events} embedded />
               </div>
