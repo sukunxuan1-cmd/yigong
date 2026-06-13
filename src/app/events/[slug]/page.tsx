@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { events } from "@/lib/data";
+import { events, membersOfEvent } from "@/lib/data";
 import { getEventBySlug } from "@/lib/serverPhotos";
 import EventDetailClient from "@/components/event/EventDetailClient";
 
@@ -26,5 +26,5 @@ export default async function EventDetailPage({
   const { slug } = await params;
   const event = getEventBySlug(slug);
   if (!event) notFound();
-  return <EventDetailClient event={event} />;
+  return <EventDetailClient event={event} members={membersOfEvent(slug)} />;
 }

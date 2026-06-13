@@ -2,13 +2,20 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { members, type Member } from "@/lib/data";
+import { members, type Member, type VolunteerEvent } from "@/lib/data";
+import PhotoImg from "@/components/PhotoImg";
 
 function initial(name: string) {
   return name.slice(0, 1);
 }
 
-export default function MemberDetail({ member }: { member: Member }) {
+export default function MemberDetail({
+  member,
+  events,
+}: {
+  member: Member;
+  events: VolunteerEvent[];
+}) {
   const idx = members.findIndex((m) => m.id === member.id);
   const prev = members[(idx - 1 + members.length) % members.length];
   const next = members[(idx + 1) % members.length];
@@ -76,13 +83,40 @@ export default function MemberDetail({ member }: { member: Member }) {
             <p className="mt-3 leading-loose text-slate-300">{member.bio}</p>
           </div>
 
-          <div className="mt-10 flex flex-wrap gap-3">
-            <Link
-              href="/events"
-              className="glass glow-ring rounded-2xl px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-105"
-            >
-              看看 TA 参与的活动 →
-            </Link>
+          {/* TA 参与过的活动 */}
+          <div className="mt-8">
+            <h2 className="font-display text-lg font-bold text-white">
+              TA 参与过的活动
+              <span className="ml-2 text-sm font-normal text-slate-400">{events.length} 场</span>
+            </h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              {events.map((e) => (
+                <Link
+                  key={e.slug}
+                  href={`/events/${e.slug}`}
+                  className="group flex gap-3 overflow-hidden rounded-2xl border border-white/8 bg-haze p-2.5 transition-transform hover:-translate-y-0.5"
+                >
+                  <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-xl">
+                    <PhotoImg
+                      seed={e.cover}
+                      src={e.coverSrc}
+                      alt={e.title}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-white group-hover:text-gradient">
+                      {e.title}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-400">{e.date}</p>
+                    <p className="mt-0.5 truncate text-xs text-slate-500">{e.location}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-10">
             <Link
               href="/members"
               className="rounded-2xl border border-white/10 px-6 py-3 text-sm font-semibold text-slate-300 transition-colors hover:border-leaf/60 hover:text-white"

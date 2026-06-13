@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import type { VolunteerEvent } from "@/lib/data";
+import type { VolunteerEvent, Member } from "@/lib/data";
 import DanmakuLayer from "@/components/event/DanmakuLayer";
 import DanmakuInput from "@/components/event/DanmakuInput";
 import LikeButton from "@/components/event/LikeButton";
@@ -16,7 +16,13 @@ const PhotoStage = dynamic(() => import("@/components/event/PhotoStage"), {
   loading: () => <div className="absolute inset-0 animate-pulse bg-haze" />,
 });
 
-export default function EventDetailClient({ event }: { event: VolunteerEvent }) {
+export default function EventDetailClient({
+  event,
+  members = [],
+}: {
+  event: VolunteerEvent;
+  members?: Member[];
+}) {
   const [index, setIndex] = useState(0);
   const [danmakuOn, setDanmakuOn] = useState(true);
   const selfMarkRef = useRef<string | null>(null);
@@ -39,6 +45,35 @@ export default function EventDetailClient({ event }: { event: VolunteerEvent }) 
           {event.date} · {event.location} · {event.participants} 人参与 · 人均 {event.hours} 小时
         </p>
         <p className="mt-4 max-w-3xl leading-relaxed text-slate-300">{event.description}</p>
+
+        {members.length > 0 && (
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <span className="text-sm text-slate-400">参与成员</span>
+            <div className="flex flex-wrap gap-2">
+              {members.map((m) => (
+                <Link
+                  key={m.id}
+                  href={`/members/${m.id}`}
+                  title={`${m.name} · ${m.role}`}
+                  className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/5 py-1 pl-1 pr-3 transition-colors hover:border-leaf/60"
+                >
+                  <span
+                    className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full text-xs font-bold text-white"
+                    style={{ background: `linear-gradient(135deg, ${m.palette[0]}, ${m.palette[1]})` }}
+                  >
+                    {m.photo ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={m.photo} alt={m.name} className="h-full w-full object-cover" />
+                    ) : (
+                      m.name.slice(0, 1)
+                    )}
+                  </span>
+                  <span className="text-xs text-slate-300 group-hover:text-white">{m.name}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </motion.div>
 
       {/* 照片互动舞台 */}

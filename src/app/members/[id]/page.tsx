@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { members, getMember } from "@/lib/data";
+import { members, getMember, type VolunteerEvent } from "@/lib/data";
+import { getEvents } from "@/lib/serverPhotos";
 import MemberDetail from "@/components/members/MemberDetail";
 
 export function generateStaticParams() {
@@ -25,5 +26,11 @@ export default async function MemberPage({
   const { id } = await params;
   const member = getMember(id);
   if (!member) notFound();
-  return <MemberDetail member={member} />;
+  // 关联活动（带封面照片），按时间倒序
+  const all = getEvents();
+  const joined: VolunteerEvent[] = member.events
+    .map((slug) => all.find((e) => e.slug === slug))
+    .filter((e): e is VolunteerEvent => Boolean(e))
+    .sort((a, b) => b.date.localeCompare(a.date));
+  return <MemberDetail member={member} events={joined} />;
 }
